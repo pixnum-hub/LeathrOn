@@ -2,35 +2,147 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeathrOn - Leather Costing Calculator</title>
 <style>
-*{box-sizing:border-box;}
-body{margin:0;font-family:Arial,sans-serif;background:#e0e0e0;transition:0.3s;}
-.dark{background:#1c1c1c;color:#fff;}
-.app{position:relative;width:95%;max-width:1000px;margin:20px auto;padding:25px;border-radius:30px;background:#e6e6e6;box-shadow:9px 9px 18px #b8b8b8,-9px -9px 18px #ffffff;}
-.dark .app{background:#2a2a2a;box-shadow:9px 9px 18px #161616,-9px -9px 18px #3a3a3a;}
-input,select,textarea{width:100%;padding:12px;margin:8px 0;border:none;border-radius:15px;background:#f2f2f2;box-shadow:inset 5px 5px 10px #bcbcbc,inset -5px -5px 10px #ffffff;outline:none;}
-input[type=number]{-moz-appearance:textfield;}
-input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
-.dark input,.dark select,.dark textarea{background:#333;color:#fff;box-shadow:inset 5px 5px 10px #141414,inset -5px -5px 10px #474747;}
-button{padding:14px 18px;border:none;border-radius:20px;margin:10px 0;background:#e6e6e6;box-shadow:6px 6px 12px #b8b8b8,-6px -6px 12px #ffffff;cursor:pointer;font-size:16px;width:100%;}
-.dark button{background:#333;color:#fff;box-shadow:6px 6px 12px #141414,-6px -6px 12px #474747;}
-.prodCard{padding:15px;border-radius:20px;background:#f3f3f3;margin:10px 0;box-shadow:inset 3px 3px 7px #bcbcbc,inset -3px -3px 7px #ffffff;}
-.dark .prodCard{background:#333;box-shadow:inset 3px 3px 7px #141414,inset -3px -3px 7px #474747;}
-.prodTitle{font-size:18px;font-weight:bold;margin:5px 0;}
-.popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:25px;border-radius:22px;z-index:999999;width:90%;max-width:450px;max-height:85vh;overflow:auto;box-shadow:0 0 30px #0004;}
-.dark .popup{background:#2e2e2e;color:#fff;}
-footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:12px 0;font-size:14px;z-index:999;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:0.3s;background:rgba(224,224,224,0.65);color:#000;box-shadow:0 -3px 12px rgba(0,0,0,0.15),inset -3px -3px 8px rgba(255,255,255,0.7),inset 3px 3px 8px rgba(0,0,0,0.1);}
-.dark footer{background:rgba(30,30,30,0.55);color:#fff;box-shadow:0 -3px 12px rgba(0,0,0,0.45),inset -3px -3px 8px rgba(80,80,80,0.2),inset 3px 3px 8px rgba(0,0,0,0.6);}
-.toggleDark{position:absolute;top:15px;right:15px;width:50px;height:50px;border-radius:50%;background:#e6e6e6;cursor:grab;box-shadow:6px 6px 12px #b8b8b8,-6px -6px 12px #ffffff;display:flex;justify-content:center;align-items:center;font-size:22px;z-index:9999;transition:0.2s;}
-.dark .toggleDark{background:#333;box-shadow:6px 6px 12px #141414,-6px -6px 12px #474747;}
-.toggleDark:active{cursor:grabbing;transform:scale(1.1);}
-.hidden{display:none;}
+/* ========== GLOBAL MOBILE-FIRST STYLING ========== */
+html, body {
+  margin:0;
+  padding:0;
+  font-family:Arial, sans-serif;
+  background:#e0e0e0;
+  transition:0.3s;
+  font-size:18px;
+}
+.dark { background:#1c1c1c; color:#fff; }
+
+/* MAIN APP CONTAINER */
+.app {
+  position:relative;
+  width:100%;
+  max-width:720px;
+  margin:0 auto;
+  padding:20px;
+  border-radius:25px;
+  background:#e6e6e6;
+  box-shadow:8px 8px 16px #b8b8b8, -8px -8px 16px #ffffff;
+}
+.dark .app {
+  background:#2a2a2a;
+  box-shadow:8px 8px 16px #161616, -8px -8px 16px #3a3a3a;
+}
+
+/* INPUTS */
+input, select, textarea {
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  border:none;
+  margin:10px 0;
+  border-radius:15px;
+  background:#f2f2f2;
+  box-shadow:inset 4px 4px 8px #bcbcbc, inset -4px -4px 8px #ffffff;
+  outline:none;
+}
+.dark input, .dark select, .dark textarea {
+  background:#333;
+  color:#fff;
+  box-shadow:inset 4px 4px 8px #141414, inset -4px -4px 8px #474747;
+}
+
+/* BUTTONS */
+button {
+  padding:16px;
+  border:none;
+  border-radius:18px;
+  margin:12px 0;
+  width:100%;
+  font-size:18px;
+  cursor:pointer;
+  background:#e6e6e6;
+  box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff;
+}
+.dark button {
+  background:#333;
+  color:#fff;
+  box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747;
+}
+
+/* PRODUCT CARDS */
+.prodCard {
+  padding:15px;
+  border-radius:18px;
+  background:#f3f3f3;
+  margin:12px 0;
+  font-size:18px;
+  box-shadow:inset 3px 3px 7px #bcbcbc, inset -3px -3px 7px #ffffff;
+}
+.dark .prodCard {
+  background:#333;
+  box-shadow:inset 3px 3px 7px #141414, inset -3px -3px 7px #474747;
+}
+.prodTitle { font-size:20px; font-weight:bold; margin-bottom:8px; }
+
+/* POPUP */
+.popup {
+  position:fixed;
+  top:50%; left:50%; transform:translate(-50%, -50%);
+  width:90vw;
+  max-width:450px;
+  max-height:85vh;
+  overflow-y:auto;
+  background:#fff;
+  color:#000;
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 0 30px #0005;
+  z-index:999999;
+}
+.dark .popup { background:#2e2e2e; color:#fff; }
+
+/* FOOTER */
+footer {
+  position:fixed;
+  bottom:0; left:0;
+  width:100%;
+  padding:14px 0;
+  text-align:center;
+  background:rgba(224,224,224,0.7);
+  font-size:16px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 -3px 12px rgba(0,0,0,0.2);
+}
+.dark footer {
+  background:rgba(30,30,30,0.65);
+  color:#fff;
+}
+
+/* DARK MODE TOGGLE – MOBILE FRIENDLY */
+.toggleDark {
+  position:absolute;
+  top:10px; right:10px;
+  width:60px; height:60px;
+  border-radius:50%;
+  background:#e6e6e6;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  cursor:grab;
+  box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff;
+  z-index:9999;
+  transition:0.2s;
+}
+.dark .toggleDark {
+  background:#333;
+  box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747;
+}
+.toggleDark:active { transform:scale(1.1); cursor:grabbing; }
 </style>
 </head>
 <body>
 
-<div class="container app" id="mainContainer">
+<div class="app" id="mainContainer">
   <div class="toggleDark" id="darkToggle"><span id="darkIcon">🌙</span></div>
 
   <h2>LeathrOn</h2>
@@ -42,8 +154,9 @@ footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:12px 
     <input id="searchProd" placeholder="Search Products" oninput="filterProducts()">
     <div id="productList"></div>
 
-    <h3>GST %</h3><input id="gst" type="number" value="18" min="0">
-    <h3>Profit %</h3><input id="profit" type="number" value="20" min="0">
+    <h3>GST %</h3><input id="gst" type="number" value="18">
+    <h3>Profit %</h3><input id="profit" type="number" value="20">
+
     <select id="currency">
       <option value="INR">INR ₹</option>
       <option value="USD">USD $</option>
@@ -61,142 +174,257 @@ footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:12px 
 
 <footer>© <span id="year"></span> Manik Roy. All Right Reserved.</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+/* Year Update */
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// DEVICE LOCK
-const deviceKey="dev-"+btoa(navigator.userAgent+screen.width+screen.height);
-if(localStorage.lc_device && localStorage.lc_device!==deviceKey){alert("Locked to another device.");document.body.innerHTML="DEVICE LOCKED";throw "";}else localStorage.lc_device=deviceKey;
+/* ------------------------- DEVICE LOCK ------------------------- */
+const deviceKey = "dev-" + btoa(navigator.userAgent + screen.width + screen.height);
+if (localStorage.lc_device && localStorage.lc_device !== deviceKey) {
+  alert("Locked to another device.");
+  document.body.innerHTML = "DEVICE LOCKED";
+  throw "";
+} else {
+  localStorage.lc_device = deviceKey;
+}
 
-// TRIAL & SUBSCRIPTION
-if(!localStorage.lc_start){localStorage.lc_start=Date.now();}
-let subscribed = localStorage.lc_sub=="yes";
-function renderSub(){
-  let rem=Math.floor((30*86400000-(Date.now()-localStorage.lc_start))/86400000);
-  const box=document.getElementById("subscriptionUI");
-  if(subscribed){document.getElementById("mainApp").classList.remove("hidden");box.innerHTML="Subscription Active ✓";return;}
-  if(Date.now()-localStorage.lc_start<30*86400000){
-    box.innerHTML=`Trial: ${rem} days left<br><button onclick="pay()">Buy ₹299/month</button>`;
+/* --------------------- TRIAL & SUBSCRIPTION --------------------- */
+if (!localStorage.lc_start) localStorage.lc_start = Date.now();
+let subscribed = localStorage.lc_sub === "yes";
+
+function renderSub() {
+  let rem = Math.floor((30*86400000 - (Date.now() - localStorage.lc_start)) / 86400000);
+  const box = document.getElementById("subscriptionUI");
+
+  if (subscribed) {
     document.getElementById("mainApp").classList.remove("hidden");
-  } else{
-    box.innerHTML=`Trial expired<br><button onclick="pay()">Buy ₹299/month</button><br><input id="adm" placeholder='Admin Code'><button onclick="admUnlock()">Unlock</button>`;
+    box.innerHTML = "Subscription Active ✓";
+    return;
+  }
+
+  if (Date.now() - localStorage.lc_start < 30*86400000) {
+    box.innerHTML = `Trial: ${rem} days left<br><button onclick="pay()">Buy ₹299/month</button>`;
+    document.getElementById("mainApp").classList.remove("hidden");
+  } else {
+    box.innerHTML = `Trial expired<br><button onclick="pay()">Buy ₹299/month</button><br><input id='adm' placeholder='Admin Code'><button onclick='admUnlock()'>Unlock</button>`;
   }
 }
-function pay(){let upi="upi://pay?pa=9433082017@ybl&pn=Manik%20Roy&am=299&cu=INR";let qr="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);pop(`<h3>Pay ₹299</h3><img src="${qr}" style="width:200px;"><br>UPI: 9433082017@ybl<button onclick='activateSub()'>I Paid</button>`);}
-function activateSub(){localStorage.lc_sub="yes";subscribed=true;saveInv("₹299 Subscription",299);closePop();renderSub();}
-function admUnlock(){if(document.getElementById("adm").value=="MR-LX9Q-72KF-P8W3"){localStorage.lc_sub="yes";subscribed=true;saveInv("Admin Unlock",0);renderSub();}else alert("Invalid Code");}
 renderSub();
 
-// POPUP
-let popbox=null;
-function pop(html){if(popbox)popbox.remove();let d=document.createElement("div");d.className="popup";d.innerHTML=html+`<br><button onclick="closePop()">Close</button>`;document.body.appendChild(d);popbox=d;}
-function closePop(){if(popbox)popbox.remove();}
+function pay() {
+  let upi = "upi://pay?pa=9433082017@ybl&pn=Manik%20Roy&am=299&cu=INR";
+  let qr = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(upi);
+  pop(`<h3>Pay ₹299</h3><img src='${qr}' style='width:200px;'><br>UPI: 9433082017@ybl<button onclick='activateSub()'>I Paid</button>`);
+}
+function activateSub() {
+  localStorage.lc_sub = "yes";
+  subscribed = true;
+  closePop();
+  renderSub();
+}
+function admUnlock() {
+  if (document.getElementById("adm").value === "MR-LX9Q-72KF-P8W3") {
+    localStorage.lc_sub = "yes";
+    subscribed = true;
+    renderSub();
+  } else alert("Invalid Code");
+}
 
-// PRODUCTS
-let products=JSON.parse(localStorage.getItem("lc_products")||"[]");
-let filteredProducts=[];
-function saveProductsToStorage(){localStorage.setItem("lc_products",JSON.stringify(products));}
+/* ---------------------------- POPUP ---------------------------- */
+let popbox = null;
+function pop(html) {
+  if (popbox) popbox.remove();
+  let d = document.createElement("div");
+  d.className = "popup";
+  d.innerHTML = html + `<br><button onclick='closePop()'>Close</button>`;
+  document.body.appendChild(d);
+  popbox = d;
+}
+function closePop() { if (popbox) popbox.remove(); }
 
-function openProductPopup(){
-  let html=`<h3>Add Product</h3>
-<label>Product Type</label><select id='p_type'><option>Bag</option><option>Wallet</option><option>Belt</option><option>Shoe</option><option>Other</option></select>
-<label>Material</label><select id='p_material'><option>Full-Grain</option><option>Top-Grain</option><option>Bonded</option></select>
-<label>Grade</label><input id='p_grade'>
-<label>Thickness (mm)</label><input id='p_thick' type='number' min='0'>
-<label>Leather Area (sq.ft)</label><input id='p_area' type='number' min='0'>
-<label>Leather Rate</label><input id='p_rate' type='number' min='0'>
-<label>Quantity</label><input id='p_qty' type='number' value='1' min='1'>
-<label>Extra Expenses</label><input id='p_extra' type='number' min='0'>
-<label>Notes</label><textarea id='p_note'></textarea>
-<label>Product Image</label><input id='p_img' type='file' accept='image/*'>
-<img id='imgPrev' style='width:100%;border-radius:15px;display:none;margin-top:10px;'>
-<button id='saveProdBtn'>Save Product</button>`;
+/* -------------------------- PRODUCT LOGIC -------------------------- */
+let products = [];
+let filteredProducts = [];
+
+function openProductPopup() {
+  let html = `
+  <h3>Add Product</h3>
+  <label>Product Type</label><select id='p_type'><option>Bag</option><option>Wallet</option><option>Belt</option><option>Shoe</option><option>Other</option></select>
+  <label>Material</label><select id='p_material'><option>Full-Grain</option><option>Top-Grain</option><option>Bonded</option></select>
+  <label>Grade</label><input id='p_grade'>
+  <label>Thickness (mm)</label><input id='p_thick' type='number'>
+  <label>Leather Area (sq.ft)</label><input id='p_area' type='number'>
+  <label>Leather Rate</label><input id='p_rate' type='number'>
+  <label>Quantity</label><input id='p_qty' type='number' value='1'>
+  <label>Extra Expenses</label><input id='p_extra' type='number'>
+  <label>Notes</label><textarea id='p_note'></textarea>
+  <label>Product Image</label><input id='p_img' type='file' accept='image/*'>
+  <img id='imgPrev' style='width:100%;display:none;border-radius:15px;margin-top:10px;'>
+  <button id='saveProdBtn'>Save Product</button>`;
+
   pop(html);
 
   const imgPrev = document.getElementById("imgPrev");
-  document.getElementById("p_img").addEventListener("change", function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => { imgPrev.src = reader.result; imgPrev.style.display = "block"; };
-    reader.readAsDataURL(file);
+  document.getElementById("p_img").addEventListener("change", e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      imgPrev.src = r.result;
+      imgPrev.style.display = "block";
+    };
+    r.readAsDataURL(f);
   });
 
   document.getElementById("saveProdBtn").addEventListener("click", saveProduct);
 }
 
-function saveProduct(){
+function saveProduct() {
   const imgPrev = document.getElementById("imgPrev");
-  const product = {
-    type: val("p_type"),
-    material: val("p_material"),
-    grade: val("p_grade"),
-    thick: num("p_thick"),
-    area: num("p_area"),
-    rate: num("p_rate"),
-    qty: num("p_qty"),
-    extra: num("p_extra"),
-    note: val("p_note"),
-    img: imgPrev.src || ""
+  const p = {
+    type: val("p_type"), material: val("p_material"), grade: val("p_grade"),
+    thick: num("p_thick"), area: num("p_area"), rate: num("p_rate"), qty: num("p_qty"),
+    extra: num("p_extra"), note: val("p_note"), img: imgPrev.src || ""
   };
-  product.total = (product.area * product.rate + product.extra) * product.qty;
-  products.push(product);
-  saveProductsToStorage();
+  p.total = (p.area * p.rate + p.extra) * p.qty;
+  products.push(p);
   closePop();
   renderProducts();
 }
 
-function val(id){return document.getElementById(id).value;}
-function num(id){return Number(val(id))||0;}
-function renderProducts(){filteredProducts=products.slice();updateProductList();}
-function updateProductList(){let box=document.getElementById("productList");box.innerHTML="";filteredProducts.forEach((p,i)=>{box.innerHTML+=`<div class='prodCard'><div class='prodTitle'>${p.type} (${p.material}) x${p.qty}</div>Area: ${p.area} sq.ft | Rate: ${p.rate}<br>Total: ₹${p.total.toFixed(2)}<br><button onclick="delProd(${i})">Delete</button> <button onclick="cloneProd(${i})">Duplicate</button></div>`;});}
-function delProd(i){products.splice(i,1);saveProductsToStorage();renderProducts();}
-function cloneProd(i){products.push(JSON.parse(JSON.stringify(products[i])));saveProductsToStorage();renderProducts();}
-function filterProducts(){const q=document.getElementById("searchProd").value.toLowerCase();filteredProducts=products.filter(p=>p.type.toLowerCase().includes(q)||p.material.toLowerCase().includes(q));updateProductList();}
-function resetAll(){if(confirm("Clear all products and inputs?")){products=[];saveProductsToStorage();renderProducts();document.getElementById("grandTotal").innerHTML="";document.getElementById("gst").value=18;document.getElementById("profit").value=20;document.getElementById("currency").value="INR";document.getElementById("searchProd").value="";}}
+function val(id){ return document.getElementById(id).value; }
+function num(id){ return Number(val(id))||0; }
 
-// DARK MODE TOGGLE
-const darkToggle = document.getElementById("darkToggle");
-let dragging = false, offsetX = 0, offsetY = 0, clickStartX = 0, clickStartY = 0, dragThreshold = 5;
-
-// Restore position from localStorage
-if(localStorage.lc_togglePos){
-  const pos = JSON.parse(localStorage.lc_togglePos);
-  darkToggle.style.left = pos.x + "px";
-  darkToggle.style.top = pos.y + "px";
+function renderProducts() {
+  filteredProducts = products.slice();
+  updateProductList();
 }
+function updateProductList() {
+  let box = document.getElementById("productList");
+  box.innerHTML = "";
+  filteredProducts.forEach((p,i)=>{
+    box.innerHTML += `
+    <div class='prodCard'>
+      <div class='prodTitle'>${p.type} (${p.material}) x${p.qty}</div>
+      Area: ${p.area} | Rate: ${p.rate}<br>
+      Total: ₹${p.total.toFixed(2)}<br>
+      <button onclick='delProd(${i})'>Delete</button>
+      <button onclick='cloneProd(${i})'>Duplicate</button>
+    </div>`;
+  });
+}
+
+function delProd(i){ products.splice(i,1); renderProducts(); }
+function cloneProd(i){ products.push(JSON.parse(JSON.stringify(products[i]))); renderProducts(); }
+
+function filterProducts(){
+  const q = document.getElementById("searchProd").value.toLowerCase();
+  filteredProducts = products.filter(p => p.type.toLowerCase().includes(q) || p.material.toLowerCase().includes(q));
+  updateProductList();
+}
+
+function resetAll(){
+  if(confirm("Clear all products and inputs?")){
+    products = [];
+    renderProducts();
+    document.getElementById("grandTotal").innerHTML = "";
+    document.getElementById("gst").value = 18;
+    document.getElementById("profit").value = 20;
+    document.getElementById("currency").value = "INR";
+    document.getElementById("searchProd").value = "";
+  }
+}
+
+/* --------------------------- CALCULATION --------------------------- */
+function calculateFinal() {
+  let sub = products.reduce((a,b)=>a+b.total,0);
+  let g = num("gst"), pr = num("profit");
+  let gstAmt = sub*(g/100);
+  let prAmt = sub*(pr/100);
+  let final = sub + gstAmt + prAmt;
+
+  const c = document.getElementById("currency").value;
+  if(c=="USD") final = (final/82).toFixed(2);
+
+  document.getElementById("grandTotal").innerHTML = `
+  Subtotal: ₹${sub.toFixed(2)}<br>
+  GST (${g}%): ₹${gstAmt.toFixed(2)}<br>
+  Profit (${pr}%): ₹${prAmt.toFixed(2)}<br><br>
+  <b>Grand Total: ${c=="INR"?"₹":"$"}${final}</b>`;
+}
+
+/* ----------------------------- EXPORTS ----------------------------- */
+function exportTXT() {
+  let t = "LEATHER COST REPORT\n\n";
+  products.forEach(p=>{ t += `${p.type} x${p.qty} = ₹${p.total.toFixed(2)}\n`; });
+  saveFile(t,"report.txt");
+}
+function exportCSV() {
+  let c = "Type,Material,Qty,Area,Rate,Total\n";
+  products.forEach(p=>{ c += `${p.type},${p.material},${p.qty},${p.area},${p.rate},${p.total}\n`; });
+  saveFile(c,"report.csv");
+}
+function saveFile(txt,name) {
+  let blob = new Blob([txt],{type:"text/plain"});
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+}
+
+/* ----------------------------- INVOICES ----------------------------- */
+function saveInv(name,amt){
+  let arr = JSON.parse(localStorage.getItem("lc_inv")||"[]");
+  arr.push({ id:"INV"+Date.now(), date:new Date().toLocaleString(), name, amt });
+  localStorage.setItem("lc_inv", JSON.stringify(arr));
+}
+function showInvoiceHistory(){
+  let arr = JSON.parse(localStorage.getItem("lc_inv")||"[]");
+  let h = "<h3>Invoice History</h3>";
+  arr.forEach(i=> h += `<p>${i.id}<br>${i.date}<br>${i.name} - ₹${i.amt}</p><hr>`);
+  pop(h);
+}
+
+/* ----------------------------- DARK MODE ----------------------------- */
+const darkToggle = document.getElementById("darkToggle");
+const appContainer = document.getElementById("mainContainer");
+let dragging=false, offsetX=0, offsetY=0, clickStartX=0, clickStartY=0, dragThreshold=5;
 
 darkToggle.addEventListener("mousedown", startDrag);
 darkToggle.addEventListener("touchstart", startDrag, {passive:false});
 
-function startDrag(e){
+function startDrag(e) {
   e.preventDefault();
   const rect = darkToggle.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const clientX = e.touches? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches? e.touches[0].clientY : e.clientY;
+
   offsetX = clientX - rect.left;
   offsetY = clientY - rect.top;
   clickStartX = clientX;
   clickStartY = clientY;
+
   dragging = false;
+
   document.addEventListener("mousemove", dragToggle);
   document.addEventListener("mouseup", endDrag);
   document.addEventListener("touchmove", dragToggle, {passive:false});
   document.addEventListener("touchend", endDrag);
 }
 
-function dragToggle(e){
+function dragToggle(e) {
   e.preventDefault();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  if(Math.abs(clientX-clickStartX) > dragThreshold || Math.abs(clientY-clickStartY) > dragThreshold){
-    dragging = true;
-  }
+  const clientX = e.touches? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches? e.touches[0].clientY : e.clientY;
+
+  if (Math.abs(clientX-clickStartX)>dragThreshold || Math.abs(clientY-clickStartY)>dragThreshold) dragging = true;
+
   let x = clientX - offsetX;
   let y = clientY - offsetY;
+
   x = Math.max(0, Math.min(window.innerWidth - darkToggle.offsetWidth, x));
   y = Math.max(0, Math.min(window.innerHeight - darkToggle.offsetHeight, y));
+
   darkToggle.style.left = x + "px";
   darkToggle.style.top = y + "px";
 }
@@ -206,8 +434,8 @@ function endDrag(e){
   document.removeEventListener("mouseup", endDrag);
   document.removeEventListener("touchmove", dragToggle);
   document.removeEventListener("touchend", endDrag);
-  localStorage.lc_togglePos = JSON.stringify({x: darkToggle.offsetLeft, y: darkToggle.offsetTop});
-  if(!dragging) toggleDarkMode();
+
+  if (!dragging) toggleDarkMode();
 }
 
 function toggleDarkMode(){
@@ -216,15 +444,10 @@ function toggleDarkMode(){
   localStorage.lc_dark = document.body.classList.contains("dark") ? "yes" : "no";
 }
 
-// Load dark mode state
-if(localStorage.lc_dark=="yes"){
+if(localStorage.lc_dark==="yes"){
   document.body.classList.add("dark");
   document.getElementById("darkIcon").textContent = "☀️";
 }
-
-// INITIAL RENDER
-renderProducts();
 </script>
 
-</body>
-</html>
+</body></html>
