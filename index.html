@@ -201,14 +201,13 @@ footer {
 <script>
 document.getElementById("year").textContent=new Date().getFullYear();
 
-/* ================= DEVICE LOCK ================= */
+/* DEVICE LOCK */
 const deviceKey="dev-"+btoa(navigator.userAgent+screen.width+screen.height);
 if(localStorage.lc_device&&localStorage.lc_device!==deviceKey){alert("Locked to another device"); document.body.innerHTML="DEVICE LOCKED"; throw"";} else{localStorage.lc_device=deviceKey;}
 
-/* ================= TRIAL/SUBSCRIPTION ================= */
+/* TRIAL/SUBSCRIPTION */
 if(!localStorage.lc_start) localStorage.lc_start=Date.now();
 let subscribed=localStorage.lc_sub==="yes";
-
 function renderSub(){
     const box=document.getElementById("subscriptionUI");
     if(subscribed){document.getElementById("mainApp").style.display="block"; box.innerHTML="Subscription Active ✓"; return;}
@@ -222,13 +221,12 @@ function renderSub(){
     }
 }
 renderSub();
-
 function pay(){alert("Scan QR to Pay ₹299 or use UPI: 9433082017@ybl");}
 function admUnlock(){
     if(document.getElementById("adm")&&document.getElementById("adm").value==="MR-LX9Q-72KF-P8W3"){localStorage.lc_sub="yes"; subscribed=true; renderSub();} else alert("Invalid Code");
 }
 
-/* ================= PRODUCTS ================= */
+/* PRODUCTS */
 let products=[];
 function openPopup(){document.getElementById("popup").style.display="block";}
 function closePopup(){document.getElementById("popup").style.display="none";}
@@ -301,7 +299,7 @@ Location: ${p.location} | Tax Type: ${p.tax}<br>
 function duplicateProduct(i){products.push(JSON.parse(JSON.stringify(products[i]))); renderProducts();}
 function deleteProduct(i){products.splice(i,1); renderProducts();}
 
-/* ================= RESET ALL ================= */
+/* RESET ALL */
 function resetAll(){
     if(confirm("Clear all products and inputs?")){
         products = [];
@@ -314,7 +312,7 @@ function resetAll(){
     }
 }
 
-/* ================= GRAND TOTAL WITH GST ================= */
+/* GRAND TOTAL */
 function calculateFinal(){
     if(products.length==0){ alert("No products added"); return; }
     
@@ -343,21 +341,64 @@ function calculateFinal(){
          <b>Grand Total: ${currency=="INR"?"₹":"$"}${display}</b>`;
 }
 
-/* ================= DARK MODE DRAG ================= */
-let darkDrag=false;
-const toggle=document.getElementById("darkToggle");
-toggle.addEventListener("click",()=>{if(!darkDrag){document.body.classList.toggle("dark"); toggle.innerHTML=document.body.classList.contains("dark")?"☀️":"🌙";} darkDrag=false;});
-let dx=0,dy=0;
-toggle.addEventListener("mousedown",dragStart);
-toggle.addEventListener("touchstart",dragStart);
-function dragStart(e){
-    let evt=e.touches?e.touches[0]:e;
-    dx=evt.clientX-toggle.offsetLeft; dy=evt.clientY-toggle.offsetTop;
-    document.addEventListener("mousemove",dragMove); document.addEventListener("mouseup",dragEnd);
-    document.addEventListener("touchmove",dragMove); document.addEventListener("touchend",dragEnd);
+/* DARK MODE TOGGLE + DRAG */
+let dragging=false, offsetX=0, offsetY=0, clickStartX=0, clickStartY=0, dragThreshold=5;
+
+darkToggle.addEventListener("mousedown", startDrag);
+darkToggle.addEventListener("touchstart", startDrag, {passive:false});
+
+function startDrag(e){
+    e.preventDefault();
+    const rect = darkToggle.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
+    clickStartX = clientX;
+    clickStartY = clientY;
+    dragging = false;
+
+    document.addEventListener("mousemove", dragMove);
+    document.addEventListener("mouseup", endDrag);
+    document.addEventListener("touchmove", dragMove, {passive:false});
+    document.addEventListener("touchend", endDrag);
 }
-function dragMove(e){darkDrag=true; let evt=e.touches?e.touches[0]:e; toggle.style.left=evt.clientX-dx+"px"; toggle.style.top=evt.clientY-dy+"px";}
-function dragEnd(){document.removeEventListener("mousemove",dragMove); document.removeEventListener("mouseup",dragEnd); document.removeEventListener("touchmove",dragMove); document.removeEventListener("touchend",dragEnd);}
+
+function dragMove(e){
+    e.preventDefault();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    if(Math.abs(clientX-clickStartX)>dragThreshold || Math.abs(clientY-clickStartY)>dragThreshold) dragging=true;
+
+    let x = clientX-offsetX;
+    let y = clientY-offsetY;
+
+    x = Math.max(0, Math.min(window.innerWidth - darkToggle.offsetWidth, x));
+    y = Math.max(0, Math.min(window.innerHeight - darkToggle.offsetHeight, y));
+
+    darkToggle.style.left = x + "px";
+    darkToggle.style.top = y + "px";
+}
+
+function endDrag(e){
+    document.removeEventListener("mousemove", dragMove);
+    document.removeEventListener("mouseup", endDrag);
+    document.removeEventListener("touchmove", dragMove);
+    document.removeEventListener("touchend", endDrag);
+
+    if(!dragging) toggleDarkMode();
+}
+
+function toggleDarkMode(){
+    document.body.classList.toggle("dark");
+    darkToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+    localStorage.lc_dark = document.body.classList.contains("dark") ? "yes" : "no";
+}
+
+if(localStorage.lc_dark==="yes"){document.body.classList.add("dark"); darkToggle.textContent="☀️";}
+
 </script>
 
 </body>
