@@ -5,301 +5,360 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeathrOn - Leather Costing Calculator</title>
 <style>
-/* ===== GLOBAL ===== */
-* { box-sizing: border-box; }
-html, body { margin:0; padding:0; font-family: Arial, sans-serif; font-size: 17px; background:#e0e0e0; transition:0.3s; }
-.dark { background:#1c1c1c; color:#fff; }
-
-/* ===== APP CONTAINER ===== */
-.app {
-  position: relative; width: 90%; max-width: 720px; margin: 0 auto; padding: 15px; border-radius: 25px;
-  background:#e6e6e6; box-shadow:8px 8px 16px #b8b8b8, -8px -8px 16px #ffffff;
+:root {
+    --bg: #e0e0e0;
+    --card: #e6e6e6;
+    --text: #000;
+    --shadow-light: #ffffff;
+    --shadow-dark: #b8b8b8;
+    --input-bg: #f2f2f2;
 }
-.dark .app { background:#2a2a2a; box-shadow:8px 8px 16px #161616, -8px -8px 16px #3a3a3a; }
-
-/* ===== INPUT GROUPS ===== */
-.inputGroup { display:flex; flex-direction: column; margin:8px 0; }
-.inputGroup label { font-weight: bold; margin-bottom: 5px; }
-input, select, textarea { width:100%; max-width:100%; padding:12px; font-size:16px; border:none; border-radius:12px;
-  background:#f2f2f2; box-shadow: inset 4px 4px 8px #bcbcbc, inset -4px -4px 8px #ffffff; outline:none; }
-.dark input, .dark select, .dark textarea { background:#333; color:#fff; box-shadow: inset 4px 4px 8px #141414, inset -4px -4px 8px #474747; }
-
-/* ===== BUTTONS ===== */
-button { padding:14px; border:none; border-radius:18px; margin:8px 0; width:100%; font-size:16px; cursor:pointer;
-  background:#e6e6e6; box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff; }
-.dark button { background:#333; color:#fff; box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747; }
-
-/* ===== PRODUCT CARD ===== */
-.prodCard { padding:12px; border-radius:15px; background:#f3f3f3; margin:10px 0; font-size:16px; 
-  box-shadow: inset 3px 3px 7px #bcbcbc, inset -3px -3px 7px #ffffff; }
-.dark .prodCard { background:#333; box-shadow: inset 3px 3px 7px #141414, inset -3px -3px 7px #474747; }
-.prodTitle { font-size:18px; font-weight:bold; margin-bottom:6px; }
-
-/* ===== FOOTER ===== */
-footer { position:fixed; bottom:0; left:0; width:100%; padding:12px 0; text-align:center; font-size:15px;
-  background: rgba(224,224,224,0.7); backdrop-filter:blur(10px); box-shadow:0 -3px 12px rgba(0,0,0,0.2); }
-.dark footer { background: rgba(30,30,30,0.65); color:#fff; }
-
-/* ===== DARK MODE TOGGLE ===== */
-.toggleDark { position: fixed; top:10px; right:10px; width:60px; height:60px; border-radius:50%;
-  background:#e6e6e6; display:flex; align-items:center; justify-content:center; font-size:26px; cursor:grab;
-  box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff; z-index:9999; transition:0.2s; }
-.dark .toggleDark { background:#333; box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747; }
-.toggleDark:active { transform:scale(1.1); cursor:grabbing; }
-
-/* ===== ADD PRODUCT POPUP ===== */
-.popup-overlay {
-  position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6);
-  display: none; justify-content: center; align-items: flex-start; padding:5px; z-index: 9999;
+body.dark {
+    --bg: #1c1c1c;
+    --card: #2a2a2a;
+    --text: #fff;
+    --shadow-light: #3a3a3a;
+    --shadow-dark: #141414;
+    --input-bg: #333;
 }
-.popup-container {
-  width:100%; max-width: 95%; background:#e0e0e0; border-radius:20px; padding:10px;
-  max-height: 95vh; overflow-y:auto; box-shadow: 8px 8px 20px #b8b8b8, -8px -8px 20px #ffffff;
-  position: relative; top: 10px;
+body {
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition:0.3s;
 }
-.dark .popup-container { background:#2a2a2a; box-shadow:8px 8px 20px #161616, -8px -8px 20px #3a3a3a; }
-.popup-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; cursor: grab; }
-.close-btn { font-size:28px; background:none; border:none; cursor:pointer; }
-#imgPrevContainer img { width:100%; border-radius:12px; margin-top:8px; }
-.popup-footer { display:flex; justify-content:space-between; margin-top:12px; }
-.btn-cancel, .btn-save { padding:12px 20px; border-radius:14px; font-size:15px; width:48%; border:none; cursor:pointer; }
-.btn-cancel { background:#ffdddd; } .btn-save { background:#c8ffc8; }
-
-/* ===== POPUP BODY TWO-COLUMN RESPONSIVE ===== */
-.popup-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.app-container {
+    width: 95%;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: var(--card);
+    border-radius: 25px;
+    box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+    box-sizing: border-box;
 }
-@media (min-width: 600px) {
-  .popup-body {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  .popup-body .inputGroup { width:48%; }
+label { display:block; margin-top:10px; font-weight:bold; }
+input, select, textarea {
+    width:100%;
+    padding:12px;
+    margin-top:5px;
+    border-radius:15px;
+    border:none;
+    background: var(--input-bg);
+    color: var(--text);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    box-sizing:border-box;
+    font-size:16px;
+}
+button {
+    padding:14px;
+    border:none;
+    border-radius:18px;
+    margin-top:10px;
+    width:100%;
+    font-size:16px;
+    cursor:pointer;
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+    transition:0.2s;
+}
+button:hover { transform: scale(1.02); }
+.product-box {
+    background: var(--card);
+    padding: 15px;
+    border-radius: 18px;
+    margin-top: 12px;
+    font-size: 14px;
+    box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+}
+.product-box b { font-size: 16px; }
+.product-box .prod-btn { margin-top:6px; padding:8px; font-size:14px; }
+#popup {
+    position: fixed;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    width: 92%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 20px;
+    padding: 20px;
+    z-index: 3000;
+    display: none;
+    box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+}
+#darkToggle {
+    width: 60px;
+    height: 60px;
+    background: var(--card);
+    border-radius: 50%;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    font-size: 24px;
+    box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+    transition:0.2s;
+}
+#darkToggle:active { transform: scale(1.1); cursor: grabbing; }
+#subscriptionUI {
+    margin: 10px 0;
+    padding: 10px;
+    text-align: center;
+    font-weight:bold;
+    border-radius:15px;
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    background: var(--card);
+}
+footer {
+    text-align:center;
+    margin-top:20px;
 }
 </style>
 </head>
-
 <body>
-<div class="app" id="mainContainer">
 
-  <!-- DARK MODE TOGGLE -->
-  <div class="toggleDark" id="darkToggle"><span id="darkIcon">🌙</span></div>
+<div id="darkToggle">🌙</div>
 
-  <h2 style="text-align:center;">LeathrOn</h2>
+<div class="app-container">
+<h2>LeathrOn</h2>
 
-  <!-- SUBSCRIPTION -->
-  <div id="subscriptionUI"></div>
+<div id="subscriptionUI"></div>
 
-  <!-- MAIN APP -->
-  <div id="mainApp">
-    <button onclick="openAddProduct()">➕ Add Product</button>
-    <button onclick="resetAll()">🗑 Reset All</button>
+<div id="mainApp" style="display:none;">
 
-    <div class="inputGroup"><label>Search Products</label><input id="searchProd" placeholder="Search Products" oninput="filterProducts()"></div>
+<label>Search Products</label>
+<input type="text" id="search" onkeyup="renderProducts()" placeholder="Search Products...">
 
-    <div id="productList"></div>
+<label>GST (%)</label>
+<input type="number" id="gst" value="18">
 
-    <div class="inputGroup"><label>GST %</label><input id="gst" type="number" value="18"></div>
-    <div class="inputGroup"><label>Profit %</label><input id="profit" type="number" value="20"></div>
+<label>Profit (%)</label>
+<input type="number" id="profit" value="20">
 
-    <div class="inputGroup"><label>Currency</label><select id="currency"><option value="INR">INR ₹</option><option value="USD">USD $</option></select></div>
+<label>Currency</label>
+<select id="currency">
+<option value="INR">INR ₹</option>
+<option value="USD">USD $</option>
+</select>
 
-    <button onclick="calculateFinal()">Calculate Grand Total</button>
-    <h2 id="grandTotal"></h2>
+<button onclick="openPopup()">➕ Add Product</button>
+<button onclick="resetAll()">🗑 Reset All</button>
 
-    <button onclick="exportTXT()">Export TXT</button>
-    <button onclick="exportCSV()">Export CSV</button>
-    <button onclick="generatePDFMenu()">Export PDF</button>
-    <button onclick="showInvoiceHistory()">Invoice History</button>
-  </div>
+<h3>Products</h3>
+<div id="productList"></div>
+
+<button onclick="calculateFinal()">Calculate Grand Total</button>
+<h2 id="grandTotal"></h2>
+
+</div>
 </div>
 
-<!-- ADD PRODUCT POPUP -->
-<div id="addProductPopup" class="popup-overlay">
-  <div class="popup-container">
-    <div class="popup-header">
-      <h2>Add New Product</h2>
-      <button class="close-btn" onclick="closeAddProduct()">×</button>
-    </div>
-    <div class="popup-body">
-      <div class="inputGroup"><label>Product Type</label><select id="p_type"><option>Bag</option><option>Wallet</option><option>Belt</option><option>Shoe</option><option>Other</option></select></div>
-      <div class="inputGroup"><label>Material</label><select id="p_material"><option>Full-Grain</option><option>Top-Grain</option><option>Bonded</option></select></div>
-      <div class="inputGroup"><label>Grade</label><input id="p_grade"></div>
-      <div class="inputGroup"><label>Thickness (mm)</label><input id="p_thick" type="number"></div>
-      <div class="inputGroup"><label>Leather Area (sq.ft)</label><input id="p_area" type="number"></div>
-      <div class="inputGroup"><label>Leather Rate</label><input id="p_rate" type="number"></div>
-      <div class="inputGroup"><label>Quantity</label><input id="p_qty" type="number" value="1"></div>
-      <div class="inputGroup"><label>Extra Expenses</label><input id="p_extra" type="number"></div>
-      <div class="inputGroup"><label>Notes</label><textarea id="p_note"></textarea></div>
-      <div class="inputGroup"><label>Product Image</label><input id="p_img" type="file" accept="image/*"><div id="imgPrevContainer"></div></div>
-    </div>
-    <div class="popup-footer">
-      <button class="btn-cancel" onclick="closeAddProduct()">Cancel</button>
-      <button class="btn-save" id="saveProdBtn">Save Product</button>
-    </div>
-  </div>
+<!-- Add Product Popup -->
+<div id="popup">
+<h3>Add New Product</h3>
+<label>Product Name</label><input type="text" id="pname">
+<label>Product Category</label><select id="pcategory"><option>Bag</option><option>Wallet</option><option>Belt</option><option>Shoe</option><option>Other</option></select>
+<label>Leather Type</label><select id="ptype"><option>Full-Grain</option><option>Top-Grain</option><option>Bonded</option></select>
+<label>Leather Grade</label><select id="pgrade"><option>A</option><option>B</option><option>C</option><option>D</option></select>
+<label>Leather Thickness (mm)</label><input type="number" id="pthickness">
+<label>Color</label><input type="text" id="pcolor">
+<label>Size (L×W)</label><input type="text" id="psize">
+<label>Leather Rate</label><input type="number" id="prate">
+<label>Quantity</label><input type="number" id="pqty" value="1">
+<label>Waste %</label><input type="number" id="pwaste" value="0">
+<label>Labour Cost</label><input type="number" id="plabour" value="0">
+<label>Chemical Cost</label><input type="number" id="pchemical" value="0">
+<label>Machine Cost</label><input type="number" id="pmachine" value="0">
+<label>Transport Cost</label><input type="number" id="ptransport" value="0">
+<label>Markup %</label><input type="number" id="pmarkup" value="0">
+<label>SKU / Product Code</label><input type="text" id="psku">
+<label>Notes / Description</label><textarea id="pnote"></textarea>
+<label>Supplier Name</label><input type="text" id="psupplier">
+<label>Supplier Contact</label><input type="text" id="psuppliercontact">
+<label>Batch Number</label><input type="text" id="pbatch">
+<label>Manufacturing Date</label><input type="date" id="pmfg">
+<label>Leather Origin (Country)</label><input type="text" id="porigin">
+<label>Production Time (Hours)</label><input type="number" id="ptime">
+<label>Storage Location</label><input type="text" id="plocation">
+<label>Tax Type</label><select id="ptax"><option>GST</option><option>IGST</option><option>NO TAX</option></select>
+
+<button onclick="saveProduct()">Save Product</button>
+<button onclick="closePopup()" style="background:#444;">Cancel</button>
 </div>
 
 <footer>© <span id="year"></span> Manik Roy. All Right Reserved.</footer>
 
 <script>
-/* ===== GENERAL ===== */
-document.getElementById("year").textContent = new Date().getFullYear();
-let products=[];
+document.getElementById("year").textContent=new Date().getFullYear();
 
-/* ===== ADD PRODUCT POPUP ===== */
-function openAddProduct(){ 
-  const popup=document.getElementById("addProductPopup");
-  const container=popup.querySelector(".popup-container");
-  container.style.top="10px";
-  popup.style.display="flex"; 
-}
-function closeAddProduct(){ document.getElementById("addProductPopup").style.display="none"; }
+/* ================= DEVICE LOCK ================= */
+const deviceKey="dev-"+btoa(navigator.userAgent+screen.width+screen.height);
+if(localStorage.lc_device&&localStorage.lc_device!==deviceKey){alert("Locked to another device"); document.body.innerHTML="DEVICE LOCKED"; throw"";} else{localStorage.lc_device=deviceKey;}
 
-document.getElementById("p_img").addEventListener("change", e=>{
-  const f=e.target.files[0]; const container=document.getElementById("imgPrevContainer");
-  if(f){ const r=new FileReader(); r.onload=()=>{ container.innerHTML=`<img src='${r.result}'>`; }; r.readAsDataURL(f); }
-});
+/* ================= TRIAL/SUBSCRIPTION ================= */
+if(!localStorage.lc_start) localStorage.lc_start=Date.now();
+let subscribed=localStorage.lc_sub==="yes";
 
-document.getElementById("saveProdBtn").addEventListener("click",()=>{
-  const p={
-    type:document.getElementById("p_type").value,
-    material:document.getElementById("p_material").value,
-    grade:document.getElementById("p_grade").value,
-    thick:Number(document.getElementById("p_thick").value),
-    area:Number(document.getElementById("p_area").value),
-    rate:Number(document.getElementById("p_rate").value),
-    qty:Number(document.getElementById("p_qty").value),
-    extra:Number(document.getElementById("p_extra").value),
-    note:document.getElementById("p_note").value,
-    img:document.getElementById("imgPrevContainer").querySelector("img")?.src||""
-  };
-  p.total=(p.area*p.rate+p.extra)*p.qty;
-  products.push(p); closeAddProduct(); renderProducts();
-});
-
-function renderProducts(){ 
-  const box=document.getElementById("productList"); 
-  box.innerHTML=""; 
-  products.forEach((p,i)=>{
-    box.innerHTML+=`<div class='prodCard'><div class='prodTitle'>${p.type} (${p.material}) x${p.qty}</div>
-      Area: ${p.area} | Rate: ${p.rate}<br>Total: ₹${p.total.toFixed(2)}<br>
-      <button onclick='delProd(${i})'>Delete</button><button onclick='cloneProd(${i})'>Duplicate</button></div>`;
-  }); 
-}
-function delProd(i){ products.splice(i,1); renderProducts(); }
-function cloneProd(i){ products.push(JSON.parse(JSON.stringify(products[i]))); renderProducts(); }
-function filterProducts(){ 
-  const q=document.getElementById("searchProd").value.toLowerCase(); 
-  renderProducts(products.filter(p=>p.type.toLowerCase().includes(q)||p.material.toLowerCase().includes(q)));
-}
-function resetAll(){ 
-  if(confirm("Clear all products and inputs?")){ 
-    products=[]; renderProducts(); 
-    document.getElementById("grandTotal").innerHTML=""; 
-    document.getElementById("gst").value=18; 
-    document.getElementById("profit").value=20; 
-    document.getElementById("currency").value="INR"; 
-    document.getElementById("searchProd").value=""; 
-  } 
-}
-
-/* ===== CALCULATION (WORKING) ===== */
-function calculateFinal() {
-    if(products.length === 0){
-        alert("No products added!");
-        return;
+function renderSub(){
+    const box=document.getElementById("subscriptionUI");
+    if(subscribed){document.getElementById("mainApp").style.display="block"; box.innerHTML="Subscription Active ✓"; return;}
+    let rem=Math.floor((30*86400000-(Date.now()-localStorage.lc_start))/86400000);
+    if(Date.now()-localStorage.lc_start<30*86400000){
+        box.innerHTML=`Trial: ${rem} days left<br><button onclick="pay()">Buy ₹299/month</button>`;
+        document.getElementById("mainApp").style.display="block";
+    } else {
+        box.innerHTML=`Trial expired<br><button onclick="pay()">Buy ₹299/month</button><br>
+        <input id='adm' placeholder='Admin Code'><button onclick='admUnlock()'>Unlock</button>`;
     }
+}
+renderSub();
+
+function pay(){alert("Scan QR to Pay ₹299 or use UPI: 9433082017@ybl");}
+function admUnlock(){
+    if(document.getElementById("adm")&&document.getElementById("adm").value==="MR-LX9Q-72KF-P8W3"){localStorage.lc_sub="yes"; subscribed=true; renderSub();} else alert("Invalid Code");
+}
+
+/* ================= PRODUCTS ================= */
+let products=[];
+function openPopup(){document.getElementById("popup").style.display="block";}
+function closePopup(){document.getElementById("popup").style.display="none";}
+function saveProduct(){
+    const pname=document.getElementById("pname").value.trim();
+    if(!pname){alert("Enter Product Name");return;}
+    let p={
+        name:pname,
+        category:document.getElementById("pcategory").value,
+        type:document.getElementById("ptype").value,
+        grade:document.getElementById("pgrade").value,
+        thickness:Number(document.getElementById("pthickness").value)||0,
+        color:document.getElementById("pcolor").value,
+        size:document.getElementById("psize").value,
+        rate:Number(document.getElementById("prate").value)||0,
+        qty:Number(document.getElementById("pqty").value)||1,
+        waste:Number(document.getElementById("pwaste").value)||0,
+        labour:Number(document.getElementById("plabour").value)||0,
+        chemical:Number(document.getElementById("pchemical").value)||0,
+        machine:Number(document.getElementById("pmachine").value)||0,
+        transport:Number(document.getElementById("ptransport").value)||0,
+        markup:Number(document.getElementById("pmarkup").value)||0,
+        sku:document.getElementById("psku").value,
+        note:document.getElementById("pnote").value,
+        supplier:document.getElementById("psupplier").value,
+        suppliercontact:document.getElementById("psuppliercontact").value,
+        batch:document.getElementById("pbatch").value,
+        mfg:document.getElementById("pmfg").value,
+        origin:document.getElementById("porigin").value,
+        ptime:Number(document.getElementById("ptime").value)||0,
+        location:document.getElementById("plocation").value,
+        tax:document.getElementById("ptax").value
+    };
+    let base=p.rate*p.qty;
+    let wasteCost=base*(p.waste/100);
+    let subtotal=base+wasteCost+p.labour+p.chemical+p.machine+p.transport;
+    let markupAmt=subtotal*(p.markup/100);
+    let gstRate=Number(document.getElementById("gst").value)||0;
+    let taxAmt=0;
+    if(p.tax=="GST"||p.tax=="IGST") taxAmt=subtotal*(gstRate/100);
+    p.total=subtotal+markupAmt+taxAmt;
+    products.push(p);
+    closePopup();
+    renderProducts();
+}
+
+function renderProducts(){
+    const search=document.getElementById("search").value.toLowerCase();
+    const list=document.getElementById("productList");
+    list.innerHTML="";
+    products.filter(p=>p.name.toLowerCase().includes(search)).forEach((p,i)=>{
+        const box=document.createElement("div");
+        box.className="product-box";
+        box.innerHTML=`
+<b>${p.name}</b><br>
+Category: ${p.category} | Type: ${p.type} | Grade: ${p.grade}<br>
+Thickness: ${p.thickness} mm | Color: ${p.color} | Size: ${p.size}<br>
+Rate: ₹${p.rate} | Qty: ${p.qty}<br>
+Waste%: ${p.waste} | Labour: ₹${p.labour} | Chemical: ₹${p.chemical}<br>
+Machine: ₹${p.machine} | Transport: ₹${p.transport} | Markup%: ${p.markup}<br>
+SKU: ${p.sku} | Supplier: ${p.supplier} | Contact: ${p.suppliercontact}<br>
+Batch: ${p.batch} | MFG: ${p.mfg} | Origin: ${p.origin} | Time: ${p.ptime} h<br>
+Location: ${p.location} | Tax Type: ${p.tax}<br>
+<b>Total: ₹${p.total.toFixed(2)}</b><br>
+<button class='prod-btn' onclick='duplicateProduct(${i})'>Duplicate</button>
+<button class='prod-btn' onclick='deleteProduct(${i})' style='background:#d32f2f;'>Delete</button>`;
+        list.appendChild(box);
+    });
+}
+function duplicateProduct(i){products.push(JSON.parse(JSON.stringify(products[i]))); renderProducts();}
+function deleteProduct(i){products.splice(i,1); renderProducts();}
+
+/* ================= RESET ALL ================= */
+function resetAll(){
+    if(confirm("Clear all products and inputs?")){
+        products = [];
+        document.getElementById("search").value = "";
+        document.getElementById("gst").value = 18;
+        document.getElementById("profit").value = 20;
+        document.getElementById("currency").value = "INR";
+        document.getElementById("grandTotal").innerHTML = "";
+        renderProducts();
+    }
+}
+
+/* ================= GRAND TOTAL WITH GST ================= */
+function calculateFinal(){
+    if(products.length==0){ alert("No products added"); return; }
+    
     let subtotal = 0;
-    for(let i=0;i<products.length;i++) subtotal += products[i].total;
-    const gst = Number(document.getElementById("gst").value) || 0;
+    let gstTotal = 0;
+    const gstRate = Number(document.getElementById("gst").value) || 0;
+    
+    products.forEach(p => {
+        subtotal += p.total;
+        if(p.tax=="GST"||p.tax=="IGST") gstTotal += p.total * (gstRate / 100);
+    });
+
     const profit = Number(document.getElementById("profit").value) || 0;
-    const gstAmt = subtotal * (gst / 100);
-    const profitAmt = subtotal * (profit / 100);
-    let grandTotal = subtotal + gstAmt + profitAmt;
+    const profitAmt = subtotal * (profit/100);
+
+    let grandTotal = subtotal + gstTotal + profitAmt;
+
     const currency = document.getElementById("currency").value;
-    if(currency === "USD") grandTotal = (grandTotal / 82).toFixed(2);
-    document.getElementById("grandTotal").innerHTML = `
-        Subtotal: ₹${subtotal.toFixed(2)}<br>
-        GST (${gst}%): ₹${gstAmt.toFixed(2)}<br>
-        Profit (${profit}%): ₹${profitAmt.toFixed(2)}<br><br>
-        <b>Grand Total: ${currency==="INR"?"₹":"$"}${grandTotal}</b>`;
+    let display = grandTotal;
+    if(currency=="USD") display = (grandTotal/82).toFixed(2);
+
+    document.getElementById("grandTotal").innerHTML=
+        `Subtotal: ₹${subtotal.toFixed(2)}<br>
+         GST (${gstRate}%): ₹${gstTotal.toFixed(2)}<br>
+         Profit (${profit}%): ₹${profitAmt.toFixed(2)}<br>
+         <b>Grand Total: ${currency=="INR"?"₹":"$"}${display}</b>`;
 }
 
-/* ===== DARK MODE TOGGLE ===== */
-const darkIcon=document.getElementById("darkIcon");
+/* ================= DARK MODE DRAG ================= */
+let darkDrag=false;
 const toggle=document.getElementById("darkToggle");
-let dragging=false,startX=0,startY=0;
-function toggleDarkMode(){
-    document.body.classList.toggle("dark");
-    const isDark=document.body.classList.contains("dark");
-    darkIcon.textContent=isDark?"☀️":"🌙";
-    localStorage.lc_dark=isDark?"yes":"no";
+toggle.addEventListener("click",()=>{if(!darkDrag){document.body.classList.toggle("dark"); toggle.innerHTML=document.body.classList.contains("dark")?"☀️":"🌙";} darkDrag=false;});
+let dx=0,dy=0;
+toggle.addEventListener("mousedown",dragStart);
+toggle.addEventListener("touchstart",dragStart);
+function dragStart(e){
+    let evt=e.touches?e.touches[0]:e;
+    dx=evt.clientX-toggle.offsetLeft; dy=evt.clientY-toggle.offsetTop;
+    document.addEventListener("mousemove",dragMove); document.addEventListener("mouseup",dragEnd);
+    document.addEventListener("touchmove",dragMove); document.addEventListener("touchend",dragEnd);
 }
-if(localStorage.lc_dark==="yes"){ document.body.classList.add("dark"); darkIcon.textContent="☀️"; }
-
-toggle.addEventListener("mousedown", startDrag);
-toggle.addEventListener("touchstart", startDrag,{passive:false});
-function startDrag(e){
-    e.preventDefault(); dragging=false;
-    const clientX=e.touches?e.touches[0].clientX:e.clientX;
-    const clientY=e.touches?e.touches[0].clientY:e.clientY;
-    startX=clientX; startY=clientY;
-    document.addEventListener(e.type.includes("touch")?"touchmove":"mousemove", dragMove,{passive:false});
-    document.addEventListener(e.type.includes("touch")?"touchend":"mouseup", endDrag);
-}
-function dragMove(e){
-    e.preventDefault(); dragging=true;
-    const clientX=e.touches?e.touches[0].clientX:e.clientX;
-    const clientY=e.touches?e.touches[0].clientY:e.clientY;
-    let x=clientX-30; let y=clientY-30;
-    x=Math.max(0,Math.min(window.innerWidth-60,x));
-    y=Math.max(0,Math.min(window.innerHeight-60,y));
-    toggle.style.left=x+"px"; toggle.style.top=y+"px";
-}
-function endDrag(e){
-    document.removeEventListener("mousemove", dragMove);
-    document.removeEventListener("mouseup", endDrag);
-    document.removeEventListener("touchmove", dragMove);
-    document.removeEventListener("touchend", endDrag);
-    if(!dragging) toggleDarkMode();
-}
-
-/* ===== DRAGGABLE ADD PRODUCT POPUP ===== */
-const popup = document.getElementById("addProductPopup");
-const popupContainer = popup.querySelector(".popup-container");
-const popupHeader = popup.querySelector(".popup-header");
-let popupDragging=false, popupStartY=0;
-
-popupHeader.addEventListener("mousedown", startPopupDrag);
-popupHeader.addEventListener("touchstart", startPopupDrag, {passive:false});
-
-function startPopupDrag(e){
-    e.preventDefault(); popupDragging=false;
-    const clientY=e.touches?e.touches[0].clientY:e.clientY;
-    popupStartY=clientY-popupContainer.getBoundingClientRect().top;
-    document.addEventListener(e.type.includes("touch")?"touchmove":"mousemove", dragPopup,{passive:false});
-    document.addEventListener(e.type.includes("touch")?"touchend":"mouseup", endPopupDrag);
-}
-
-function dragPopup(e){
-    e.preventDefault(); popupDragging=true;
-    const clientY=e.touches?e.touches[0].clientY:e.clientY;
-    let y=clientY-popupStartY;
-    y=Math.max(10, Math.min(window.innerHeight-popupContainer.offsetHeight-10,y));
-    popupContainer.style.position="absolute";
-    popupContainer.style.top=y+"px";
-}
-
-function endPopupDrag(e){
-    document.removeEventListener("mousemove", dragPopup);
-    document.removeEventListener("mouseup", endPopupDrag);
-    document.removeEventListener("touchmove", dragPopup);
-    document.removeEventListener("touchend", endPopupDrag);
-}
+function dragMove(e){darkDrag=true; let evt=e.touches?e.touches[0]:e; toggle.style.left=evt.clientX-dx+"px"; toggle.style.top=evt.clientY-dy+"px";}
+function dragEnd(){document.removeEventListener("mousemove",dragMove); document.removeEventListener("mouseup",dragEnd); document.removeEventListener("touchmove",dragMove); document.removeEventListener("touchend",dragEnd);}
 </script>
+
 </body>
 </html>
