@@ -154,7 +154,7 @@ let products=[];
 function openAddProduct(){ 
   const popup=document.getElementById("addProductPopup");
   const container=popup.querySelector(".popup-container");
-  container.style.top="10px"; // reset top
+  container.style.top="10px";
   popup.style.display="flex"; 
 }
 function closeAddProduct(){ document.getElementById("addProductPopup").style.display="none"; }
@@ -194,8 +194,7 @@ function delProd(i){ products.splice(i,1); renderProducts(); }
 function cloneProd(i){ products.push(JSON.parse(JSON.stringify(products[i]))); renderProducts(); }
 function filterProducts(){ 
   const q=document.getElementById("searchProd").value.toLowerCase(); 
-  const filtered=products.filter(p=>p.type.toLowerCase().includes(q)||p.material.toLowerCase().includes(q));
-  products=filtered; renderProducts();
+  renderProducts(products.filter(p=>p.type.toLowerCase().includes(q)||p.material.toLowerCase().includes(q)));
 }
 function resetAll(){ 
   if(confirm("Clear all products and inputs?")){ 
@@ -206,6 +205,23 @@ function resetAll(){
     document.getElementById("currency").value="INR"; 
     document.getElementById("searchProd").value=""; 
   } 
+}
+
+/* ===== CALCULATION ===== */
+function calculateFinal() {
+  if(products.length===0){ alert("No products added!"); return; }
+  let sub=products.reduce((a,b)=>a+b.total,0);
+  let g=Number(document.getElementById("gst").value)||0;
+  let pr=Number(document.getElementById("profit").value)||0;
+  let gstAmt=sub*(g/100), prAmt=sub*(pr/100);
+  let final=sub+gstAmt+prAmt;
+  const c=document.getElementById("currency").value;
+  let displayFinal=final; if(c=="USD") displayFinal=(final/82).toFixed(2);
+  document.getElementById("grandTotal").innerHTML=`
+    Subtotal: ₹${sub.toFixed(2)}<br>
+    GST (${g}%): ₹${gstAmt.toFixed(2)}<br>
+    Profit (${pr}%): ₹${prAmt.toFixed(2)}<br><br>
+    <b>Grand Total: ${c=="INR"?"₹":"$"}${displayFinal}</b>`;
 }
 
 /* ===== DARK MODE TOGGLE ===== */
@@ -226,8 +242,7 @@ toggle.addEventListener("mousedown", startDrag);
 toggle.addEventListener("touchstart", startDrag,{passive:false});
 
 function startDrag(e){
-    e.preventDefault();
-    dragging=false;
+    e.preventDefault(); dragging=false;
     const clientX=e.touches?e.touches[0].clientX:e.clientX;
     const clientY=e.touches?e.touches[0].clientY:e.clientY;
     startX=clientX; startY=clientY;
@@ -236,8 +251,7 @@ function startDrag(e){
 }
 
 function dragMove(e){
-    e.preventDefault();
-    dragging=true;
+    e.preventDefault(); dragging=true;
     const clientX=e.touches?e.touches[0].clientX:e.clientX;
     const clientY=e.touches?e.touches[0].clientY:e.clientY;
     let x=clientX-30; let y=clientY-30;
@@ -254,32 +268,30 @@ function endDrag(e){
     if(!dragging) toggleDarkMode();
 }
 
-/* ===== VERTICALLY DRAGGABLE POPUP ===== */
+/* ===== DRAGGABLE ADD PRODUCT POPUP ===== */
 const popup = document.getElementById("addProductPopup");
 const popupContainer = popup.querySelector(".popup-container");
 const popupHeader = popup.querySelector(".popup-header");
-let popupDragging = false, popupStartY = 0;
+let popupDragging=false, popupStartY=0;
 
 popupHeader.addEventListener("mousedown", startPopupDrag);
 popupHeader.addEventListener("touchstart", startPopupDrag, {passive:false});
 
 function startPopupDrag(e){
-    e.preventDefault();
-    popupDragging = false;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    popupStartY = clientY - popupContainer.getBoundingClientRect().top;
+    e.preventDefault(); popupDragging=false;
+    const clientY=e.touches?e.touches[0].clientY:e.clientY;
+    popupStartY=clientY-popupContainer.getBoundingClientRect().top;
     document.addEventListener(e.type.includes("touch")?"touchmove":"mousemove", dragPopup,{passive:false});
     document.addEventListener(e.type.includes("touch")?"touchend":"mouseup", endPopupDrag);
 }
 
 function dragPopup(e){
-    e.preventDefault();
-    popupDragging = true;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    let y = clientY - popupStartY;
-    y = Math.max(10, Math.min(window.innerHeight - popupContainer.offsetHeight - 10, y));
-    popupContainer.style.position = "absolute";
-    popupContainer.style.top = y + "px";
+    e.preventDefault(); popupDragging=true;
+    const clientY=e.touches?e.touches[0].clientY:e.clientY;
+    let y=clientY-popupStartY;
+    y=Math.max(10, Math.min(window.innerHeight-popupContainer.offsetHeight-10,y));
+    popupContainer.style.position="absolute";
+    popupContainer.style.top=y+"px";
 }
 
 function endPopupDrag(e){
