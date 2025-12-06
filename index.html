@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <title>LeathrOn - Leather Costing Calculator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{margin:0;font-family:Arial;background:#e0e0e0;transition:0.3s;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:Arial,sans-serif;background:#e0e0e0;transition:0.3s;}
 .dark{background:#1c1c1c;color:#fff;}
-.app{position:relative;max-width:1000px;margin:30px auto;padding:25px;border-radius:30px;background:#e6e6e6;box-shadow:9px 9px 18px #b8b8b8,-9px -9px 18px #ffffff;}
+.app{position:relative;width:95%;max-width:1000px;margin:20px auto;padding:25px;border-radius:30px;background:#e6e6e6;box-shadow:9px 9px 18px #b8b8b8,-9px -9px 18px #ffffff;}
 .dark .app{background:#2a2a2a;box-shadow:9px 9px 18px #161616,-9px -9px 18px #3a3a3a;}
-input,select,textarea{width:100%;padding:12px;border:none;margin:8px 0;border-radius:15px;background:#f2f2f2;box-shadow:inset 5px 5px 10px #bcbcbc,inset -5px -5px 10px #ffffff;outline:none;}
+input,select,textarea{width:100%;padding:12px;margin:8px 0;border:none;border-radius:15px;background:#f2f2f2;box-shadow:inset 5px 5px 10px #bcbcbc,inset -5px -5px 10px #ffffff;outline:none;}
+input[type=number]{-moz-appearance:textfield;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .dark input,.dark select,.dark textarea{background:#333;color:#fff;box-shadow:inset 5px 5px 10px #141414,inset -5px -5px 10px #474747;}
 button{padding:14px 18px;border:none;border-radius:20px;margin:10px 0;background:#e6e6e6;box-shadow:6px 6px 12px #b8b8b8,-6px -6px 12px #ffffff;cursor:pointer;font-size:16px;width:100%;}
 .dark button{background:#333;color:#fff;box-shadow:6px 6px 12px #141414,-6px -6px 12px #474747;}
@@ -23,19 +25,12 @@ footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:12px 
 .toggleDark{position:absolute;top:15px;right:15px;width:50px;height:50px;border-radius:50%;background:#e6e6e6;cursor:grab;box-shadow:6px 6px 12px #b8b8b8,-6px -6px 12px #ffffff;display:flex;justify-content:center;align-items:center;font-size:22px;z-index:9999;transition:0.2s;}
 .dark .toggleDark{background:#333;box-shadow:6px 6px 12px #141414,-6px -6px 12px #474747;}
 .toggleDark:active{cursor:grabbing;transform:scale(1.1);}
-
-/* Mobile responsiveness */
-@media (max-width: 600px) {
-  .app { max-width: 95%; margin:20px auto; padding:20px; border-radius:20px;}
-  .toggleDark {width:45px; height:45px; font-size:20px;}
-  input, select, textarea, button {font-size:15px; padding:10px;}
-  #productList .prodCard {font-size:14px; padding:10px;}
-}
+.hidden{display:none;}
 </style>
 </head>
 <body>
 
-<div class="app" id="mainContainer">
+<div class="container app" id="mainContainer">
   <div class="toggleDark" id="darkToggle"><span id="darkIcon">🌙</span></div>
 
   <h2>LeathrOn</h2>
@@ -47,8 +42,8 @@ footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:12px 
     <input id="searchProd" placeholder="Search Products" oninput="filterProducts()">
     <div id="productList"></div>
 
-    <h3>GST %</h3><input id="gst" type="number" value="18">
-    <h3>Profit %</h3><input id="profit" type="number" value="20">
+    <h3>GST %</h3><input id="gst" type="number" value="18" min="0">
+    <h3>Profit %</h3><input id="profit" type="number" value="20" min="0">
     <select id="currency">
       <option value="INR">INR ₹</option>
       <option value="USD">USD $</option>
@@ -68,159 +63,168 @@ footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:12px 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-// ====== AUTO YEAR ======
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// ====== DARK MODE TOGGLE ======
-const darkToggle=document.getElementById("darkToggle"),darkIcon=document.getElementById("darkIcon"),appContainer=document.getElementById("mainContainer");
-let dragOffsetX=0, dragOffsetY=0, dragging=false, clickStartX=0, clickStartY=0, dragThreshold=5;
-darkToggle.addEventListener("mousedown",startDrag);
-darkToggle.addEventListener("touchstart",startDrag,{passive:false});
-function startDrag(e){
- e.preventDefault();
- const rect=darkToggle.getBoundingClientRect();
- clickStartX=e.clientX||e.touches[0].clientX;
- clickStartY=e.clientY||e.touches[0].clientY;
- dragOffsetX=clickStartX-rect.left;
- dragOffsetY=clickStartY-rect.top;
- dragging=false;
- document.addEventListener("mousemove",dragMove);
- document.addEventListener("mouseup",endDrag);
- document.addEventListener("touchmove",dragMove,{passive:false});
- document.addEventListener("touchend",endDrag);
-}
-function dragMove(e){
- e.preventDefault();
- const clientX=e.clientX||e.touches[0].clientX;
- const clientY=e.clientY||e.touches[0].clientY;
- if(Math.abs(clientX-clickStartX)>dragThreshold||Math.abs(clientY-clickStartY)>dragThreshold) dragging=true;
- const rect=appContainer.getBoundingClientRect();
- let x=clientX-rect.left-dragOffsetX;
- let y=clientY-rect.top-dragOffsetY;
- x=Math.max(0,Math.min(rect.width-darkToggle.offsetWidth,x));
- y=Math.max(0,Math.min(rect.height-darkToggle.offsetHeight,y));
- darkToggle.style.left=x+"px";
- darkToggle.style.top=y+"px";
-}
-function endDrag(e){
- document.removeEventListener("mousemove",dragMove);
- document.removeEventListener("mouseup",endDrag);
- document.removeEventListener("touchmove",dragMove);
- document.removeEventListener("touchend",endDrag);
- if(!dragging) toggleDark();
-}
-function toggleDark(){
- document.body.classList.toggle("dark");
- darkIcon.textContent=document.body.classList.contains("dark")?"☀️":"🌙";
- localStorage.lc_dark=document.body.classList.contains("dark")?"yes":"no";
-}
-if(localStorage.lc_dark=="yes"){document.body.classList.add("dark");darkIcon.textContent="☀️";}
-
-// ====== DEVICE LOCK, TRIAL & SUBSCRIPTION ======
+// DEVICE LOCK
 const deviceKey="dev-"+btoa(navigator.userAgent+screen.width+screen.height);
-if(localStorage.hip_device&&localStorage.hip_device!==deviceKey){alert("This app is locked to another PC.");document.body.innerHTML="DEVICE LOCKED";throw "";}else localStorage.hip_device=deviceKey;
-if(!localStorage.hip_start){localStorage.hip_start=Date.now();}
-const trialDays=30,ms=1000*60*60*24,passed=Math.floor((Date.now()-Number(localStorage.hip_start))/ms);
-let subscribed=localStorage.hip_sub=="yes";
-if(Date.now()<Number(localStorage.hip_start)){localStorage.hip_start=Date.now();}
+if(localStorage.lc_device && localStorage.lc_device!==deviceKey){alert("Locked to another device.");document.body.innerHTML="DEVICE LOCKED";throw "";}else localStorage.lc_device=deviceKey;
 
-function renderSubUI(){
- let el=document.getElementById("subscriptionUI");
- if(subscribed){document.getElementById("mainApp").classList.remove("hidden"); el.innerHTML="<p>Subscription Active ✓</p>"; return;}
- if(passed<=trialDays){
-   el.innerHTML=`<p>Trial Remaining: ${trialDays-passed} days</p><button onclick="openPayment()">Buy ₹299/month</button>`;
-   document.getElementById("mainApp").classList.remove("hidden");
- } else {
-   el.innerHTML=`<p>Your trial has expired.</p>
-   <button onclick="openPayment()">Buy ₹299/month</button><br><br>
-   <input id="adminCode" placeholder="Admin Unlock Code"><button onclick="adminUnlock()">Unlock</button>`;
- }
+// TRIAL & SUBSCRIPTION
+if(!localStorage.lc_start){localStorage.lc_start=Date.now();}
+let subscribed = localStorage.lc_sub=="yes";
+function renderSub(){
+  let rem=Math.floor((30*86400000-(Date.now()-localStorage.lc_start))/86400000);
+  const box=document.getElementById("subscriptionUI");
+  if(subscribed){document.getElementById("mainApp").classList.remove("hidden");box.innerHTML="Subscription Active ✓";return;}
+  if(Date.now()-localStorage.lc_start<30*86400000){
+    box.innerHTML=`Trial: ${rem} days left<br><button onclick="pay()">Buy ₹299/month</button>`;
+    document.getElementById("mainApp").classList.remove("hidden");
+  } else{
+    box.innerHTML=`Trial expired<br><button onclick="pay()">Buy ₹299/month</button><br><input id="adm" placeholder='Admin Code'><button onclick="admUnlock()">Unlock</button>`;
+  }
 }
-renderSubUI();
-function openPayment(){alert("Simulate UPI Payment here.");}
-function adminUnlock(){let code=document.getElementById("adminCode").value.trim(); if(code=="MR-LX9Q-72KF-P8W3"){localStorage.hip_sub="yes";subscribed=true; renderSubUI();}else alert("Invalid code");}
+function pay(){let upi="upi://pay?pa=9433082017@ybl&pn=Manik%20Roy&am=299&cu=INR";let qr="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);pop(`<h3>Pay ₹299</h3><img src="${qr}" style="width:200px;"><br>UPI: 9433082017@ybl<button onclick='activateSub()'>I Paid</button>`);}
+function activateSub(){localStorage.lc_sub="yes";subscribed=true;saveInv("₹299 Subscription",299);closePop();renderSub();}
+function admUnlock(){if(document.getElementById("adm").value=="MR-LX9Q-72KF-P8W3"){localStorage.lc_sub="yes";subscribed=true;saveInv("Admin Unlock",0);renderSub();}else alert("Invalid Code");}
+renderSub();
 
-// ====== PRODUCTS & CALCULATION ======
-let products=[];
+// POPUP
+let popbox=null;
+function pop(html){if(popbox)popbox.remove();let d=document.createElement("div");d.className="popup";d.innerHTML=html+`<br><button onclick="closePop()">Close</button>`;document.body.appendChild(d);popbox=d;}
+function closePop(){if(popbox)popbox.remove();}
+
+// PRODUCTS
+let products=JSON.parse(localStorage.getItem("lc_products")||"[]");
+let filteredProducts=[];
+function saveProductsToStorage(){localStorage.setItem("lc_products",JSON.stringify(products));}
+
 function openProductPopup(){
- popup(`<h3>Add Product</h3>
- <label>Product Name</label><input id="pName">
- <label>Leather Area (sq.ft)</label><input id="pArea" type="number">
- <label>Leather Rate</label><input id="pRate" type="number">
- <label>Other Expenses</label><input id="pExtra" type="number" value="0">
- <label>Currency</label><select id="pCcy"><option value="INR">INR ₹</option><option value="USD">USD $</option></select>
- <button onclick="addProduct()">Add</button>`);
-}
-function addProduct(){
- let name=document.getElementById("pName").value.trim();
- let area=Number(document.getElementById("pArea").value);
- let rate=Number(document.getElementById("pRate").value);
- let extra=Number(document.getElementById("pExtra").value);
- let ccy=document.getElementById("pCcy").value;
- if(!name||area<=0||rate<=0){alert("Enter valid details"); return;}
- products.push({name,area,rate,extra,ccy});
- closePopup();renderProducts();
-}
-function renderProducts(){
- let html="";
- products.forEach((p,i)=>{
-   let total=p.area*p.rate+p.extra;
-   if(p.ccy=="USD") total=(total/82).toFixed(2);
-   html+=`<div class="prodCard"><div class="prodTitle">${p.name}</div>
-   <p>Total: ${p.ccy=="INR"?"₹":"$"}${total}</p>
-   <button onclick="removeProduct(${i})">Remove</button></div>`;
- });
- document.getElementById("productList").innerHTML=html;
-}
-function removeProduct(i){products.splice(i,1);renderProducts();}
-function resetAll(){if(confirm("Clear all products and inputs?")){products=[];renderProducts();document.getElementById("grandTotal").textContent="";document.getElementById("gst").value=18;document.getElementById("profit").value=20;}}
-function filterProducts(){let val=document.getElementById("searchProd").value.toLowerCase();document.querySelectorAll("#productList .prodCard").forEach((c,i)=>{c.style.display=products[i].name.toLowerCase().includes(val)?"block":"none";});}
-function calculateFinal(){
- let gst=Number(document.getElementById("gst").value)/100,profit=Number(document.getElementById("profit").value)/100,ccy=document.getElementById("currency").value,total=0;
- products.forEach(p=>{let t=p.area*p.rate+p.extra;if(p.ccy=="USD") t/=82; total+=t;});
- total=total*(1+gst+profit);
- if(ccy=="USD") total=(total/82).toFixed(2); else total=total.toFixed(2);
- document.getElementById("grandTotal").textContent=(ccy=="INR"?"₹":"$")+total;
+  let html=`<h3>Add Product</h3>
+<label>Product Type</label><select id='p_type'><option>Bag</option><option>Wallet</option><option>Belt</option><option>Shoe</option><option>Other</option></select>
+<label>Material</label><select id='p_material'><option>Full-Grain</option><option>Top-Grain</option><option>Bonded</option></select>
+<label>Grade</label><input id='p_grade'>
+<label>Thickness (mm)</label><input id='p_thick' type='number' min='0'>
+<label>Leather Area (sq.ft)</label><input id='p_area' type='number' min='0'>
+<label>Leather Rate</label><input id='p_rate' type='number' min='0'>
+<label>Quantity</label><input id='p_qty' type='number' value='1' min='1'>
+<label>Extra Expenses</label><input id='p_extra' type='number' min='0'>
+<label>Notes</label><textarea id='p_note'></textarea>
+<label>Product Image</label><input id='p_img' type='file' accept='image/*'>
+<img id='imgPrev' style='width:100%;border-radius:15px;display:none;margin-top:10px;'>
+<button id='saveProdBtn'>Save Product</button>`;
+  pop(html);
+
+  const imgPrev = document.getElementById("imgPrev");
+  document.getElementById("p_img").addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { imgPrev.src = reader.result; imgPrev.style.display = "block"; };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("saveProdBtn").addEventListener("click", saveProduct);
 }
 
-// ====== EXPORT TXT & CSV ======
-function exportTXT(){let text="Leather Products:\n";products.forEach((p,i)=>{text+=`${i+1}. ${p.name} - ${p.area}sq.ft x ${p.rate} + ${p.extra} ${p.ccy}\n`;});let blob=new Blob([text],{type:"text/plain"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="products.txt";a.click();}
-function exportCSV(){let csv="Name,Area,Rate,Extra,Currency\n";products.forEach(p=>{csv+=`${p.name},${p.area},${p.rate},${p.extra},${p.ccy}\n`;});let blob=new Blob([csv],{type:"text/csv"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="products.csv";a.click();}
-
-// ====== PDF GENERATION ======
-function generatePDFMenu(){
- const { jsPDF } = window.jspdf;
- let doc=new jsPDF();
- doc.setFontSize(16);
- doc.text("Leather Product Invoice",14,20);
- let y=30;
- products.forEach((p,i)=>{
-   let total=p.area*p.rate+p.extra;
-   if(p.ccy=="USD") total=(total/82).toFixed(2);
-   doc.setFontSize(12);
-   doc.text(`${i+1}. ${p.name} - ${p.area}sq.ft x ${p.rate} + ${p.extra} ${p.ccy} = ${total}`,14,y);
-   y+=10;
-   if(y>280){doc.addPage();y=20;}
- });
- let gst=Number(document.getElementById("gst").value),profit=Number(document.getElementById("profit").value),totalAmount=document.getElementById("grandTotal").textContent;
- doc.text(`GST: ${gst}%, Profit: ${profit}%`,14,y+10);
- doc.text(`Grand Total: ${totalAmount}`,14,y+20);
- doc.save("invoice.pdf");
+function saveProduct(){
+  const imgPrev = document.getElementById("imgPrev");
+  const product = {
+    type: val("p_type"),
+    material: val("p_material"),
+    grade: val("p_grade"),
+    thick: num("p_thick"),
+    area: num("p_area"),
+    rate: num("p_rate"),
+    qty: num("p_qty"),
+    extra: num("p_extra"),
+    note: val("p_note"),
+    img: imgPrev.src || ""
+  };
+  product.total = (product.area * product.rate + product.extra) * product.qty;
+  products.push(product);
+  saveProductsToStorage();
+  closePop();
+  renderProducts();
 }
 
-// ====== POPUP SYSTEM ======
-let currentPopup=null;
-function popup(html){if(currentPopup) currentPopup.remove();let box=document.createElement("div");box.className="popup";box.innerHTML=html+`<br><br><button onclick="closePopup()">Close</button>`;document.body.appendChild(box);currentPopup=box;}
-function closePopup(){if(currentPopup) currentPopup.remove();currentPopup=null;}
+function val(id){return document.getElementById(id).value;}
+function num(id){return Number(val(id))||0;}
+function renderProducts(){filteredProducts=products.slice();updateProductList();}
+function updateProductList(){let box=document.getElementById("productList");box.innerHTML="";filteredProducts.forEach((p,i)=>{box.innerHTML+=`<div class='prodCard'><div class='prodTitle'>${p.type} (${p.material}) x${p.qty}</div>Area: ${p.area} sq.ft | Rate: ${p.rate}<br>Total: ₹${p.total.toFixed(2)}<br><button onclick="delProd(${i})">Delete</button> <button onclick="cloneProd(${i})">Duplicate</button></div>`;});}
+function delProd(i){products.splice(i,1);saveProductsToStorage();renderProducts();}
+function cloneProd(i){products.push(JSON.parse(JSON.stringify(products[i])));saveProductsToStorage();renderProducts();}
+function filterProducts(){const q=document.getElementById("searchProd").value.toLowerCase();filteredProducts=products.filter(p=>p.type.toLowerCase().includes(q)||p.material.toLowerCase().includes(q));updateProductList();}
+function resetAll(){if(confirm("Clear all products and inputs?")){products=[];saveProductsToStorage();renderProducts();document.getElementById("grandTotal").innerHTML="";document.getElementById("gst").value=18;document.getElementById("profit").value=20;document.getElementById("currency").value="INR";document.getElementById("searchProd").value="";}}
 
-// ====== INVOICE HISTORY ======
-function showInvoiceHistory(){
- let inv=JSON.parse(localStorage.getItem("hip_inv")||"[]");
- let html="<h2>Invoices</h2>";
- if(inv.length==0) html+="No invoices.";
- inv.forEach(i=>{html+=`<p><b>${i.id}</b><br>${i.date}<br>₹${i.amount}</p><hr>`;});
- popup(html);
+// DARK MODE TOGGLE
+const darkToggle = document.getElementById("darkToggle");
+let dragging = false, offsetX = 0, offsetY = 0, clickStartX = 0, clickStartY = 0, dragThreshold = 5;
+
+// Restore position from localStorage
+if(localStorage.lc_togglePos){
+  const pos = JSON.parse(localStorage.lc_togglePos);
+  darkToggle.style.left = pos.x + "px";
+  darkToggle.style.top = pos.y + "px";
 }
+
+darkToggle.addEventListener("mousedown", startDrag);
+darkToggle.addEventListener("touchstart", startDrag, {passive:false});
+
+function startDrag(e){
+  e.preventDefault();
+  const rect = darkToggle.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+  clickStartX = clientX;
+  clickStartY = clientY;
+  dragging = false;
+  document.addEventListener("mousemove", dragToggle);
+  document.addEventListener("mouseup", endDrag);
+  document.addEventListener("touchmove", dragToggle, {passive:false});
+  document.addEventListener("touchend", endDrag);
+}
+
+function dragToggle(e){
+  e.preventDefault();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  if(Math.abs(clientX-clickStartX) > dragThreshold || Math.abs(clientY-clickStartY) > dragThreshold){
+    dragging = true;
+  }
+  let x = clientX - offsetX;
+  let y = clientY - offsetY;
+  x = Math.max(0, Math.min(window.innerWidth - darkToggle.offsetWidth, x));
+  y = Math.max(0, Math.min(window.innerHeight - darkToggle.offsetHeight, y));
+  darkToggle.style.left = x + "px";
+  darkToggle.style.top = y + "px";
+}
+
+function endDrag(e){
+  document.removeEventListener("mousemove", dragToggle);
+  document.removeEventListener("mouseup", endDrag);
+  document.removeEventListener("touchmove", dragToggle);
+  document.removeEventListener("touchend", endDrag);
+  localStorage.lc_togglePos = JSON.stringify({x: darkToggle.offsetLeft, y: darkToggle.offsetTop});
+  if(!dragging) toggleDarkMode();
+}
+
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+  document.getElementById("darkIcon").textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  localStorage.lc_dark = document.body.classList.contains("dark") ? "yes" : "no";
+}
+
+// Load dark mode state
+if(localStorage.lc_dark=="yes"){
+  document.body.classList.add("dark");
+  document.getElementById("darkIcon").textContent = "☀️";
+}
+
+// INITIAL RENDER
+renderProducts();
 </script>
+
 </body>
 </html>
