@@ -207,40 +207,42 @@ function resetAll(){
   } 
 }
 
-/* ===== CALCULATION ===== */
+/* ===== CALCULATION (WORKING) ===== */
 function calculateFinal() {
-  if(products.length===0){ alert("No products added!"); return; }
-  let sub=products.reduce((a,b)=>a+b.total,0);
-  let g=Number(document.getElementById("gst").value)||0;
-  let pr=Number(document.getElementById("profit").value)||0;
-  let gstAmt=sub*(g/100), prAmt=sub*(pr/100);
-  let final=sub+gstAmt+prAmt;
-  const c=document.getElementById("currency").value;
-  let displayFinal=final; if(c=="USD") displayFinal=(final/82).toFixed(2);
-  document.getElementById("grandTotal").innerHTML=`
-    Subtotal: ₹${sub.toFixed(2)}<br>
-    GST (${g}%): ₹${gstAmt.toFixed(2)}<br>
-    Profit (${pr}%): ₹${prAmt.toFixed(2)}<br><br>
-    <b>Grand Total: ${c=="INR"?"₹":"$"}${displayFinal}</b>`;
+    if(products.length === 0){
+        alert("No products added!");
+        return;
+    }
+    let subtotal = 0;
+    for(let i=0;i<products.length;i++) subtotal += products[i].total;
+    const gst = Number(document.getElementById("gst").value) || 0;
+    const profit = Number(document.getElementById("profit").value) || 0;
+    const gstAmt = subtotal * (gst / 100);
+    const profitAmt = subtotal * (profit / 100);
+    let grandTotal = subtotal + gstAmt + profitAmt;
+    const currency = document.getElementById("currency").value;
+    if(currency === "USD") grandTotal = (grandTotal / 82).toFixed(2);
+    document.getElementById("grandTotal").innerHTML = `
+        Subtotal: ₹${subtotal.toFixed(2)}<br>
+        GST (${gst}%): ₹${gstAmt.toFixed(2)}<br>
+        Profit (${profit}%): ₹${profitAmt.toFixed(2)}<br><br>
+        <b>Grand Total: ${currency==="INR"?"₹":"$"}${grandTotal}</b>`;
 }
 
 /* ===== DARK MODE TOGGLE ===== */
 const darkIcon=document.getElementById("darkIcon");
 const toggle=document.getElementById("darkToggle");
 let dragging=false,startX=0,startY=0;
-
 function toggleDarkMode(){
     document.body.classList.toggle("dark");
     const isDark=document.body.classList.contains("dark");
     darkIcon.textContent=isDark?"☀️":"🌙";
     localStorage.lc_dark=isDark?"yes":"no";
 }
-
 if(localStorage.lc_dark==="yes"){ document.body.classList.add("dark"); darkIcon.textContent="☀️"; }
 
 toggle.addEventListener("mousedown", startDrag);
 toggle.addEventListener("touchstart", startDrag,{passive:false});
-
 function startDrag(e){
     e.preventDefault(); dragging=false;
     const clientX=e.touches?e.touches[0].clientX:e.clientX;
@@ -249,7 +251,6 @@ function startDrag(e){
     document.addEventListener(e.type.includes("touch")?"touchmove":"mousemove", dragMove,{passive:false});
     document.addEventListener(e.type.includes("touch")?"touchend":"mouseup", endDrag);
 }
-
 function dragMove(e){
     e.preventDefault(); dragging=true;
     const clientX=e.touches?e.touches[0].clientX:e.clientX;
@@ -259,7 +260,6 @@ function dragMove(e){
     y=Math.max(0,Math.min(window.innerHeight-60,y));
     toggle.style.left=x+"px"; toggle.style.top=y+"px";
 }
-
 function endDrag(e){
     document.removeEventListener("mousemove", dragMove);
     document.removeEventListener("mouseup", endDrag);
