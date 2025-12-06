@@ -4,71 +4,81 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeathrOn - Leather Costing Calculator</title>
-
 <style>
 /* ===== GLOBAL ===== */
-* { box-sizing:border-box; }
-html, body { margin:0; padding:0; font-family:Arial, sans-serif; font-size:17px; background:#e0e0e0; transition:0.3s; }
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; font-family: Arial, sans-serif; font-size: 17px; background:#e0e0e0; transition:0.3s; }
 .dark { background:#1c1c1c; color:#fff; }
 
 /* ===== APP CONTAINER ===== */
 .app {
-  position:relative; width:90%; max-width:720px; margin:0 auto; padding:15px; border-radius:25px;
+  position: relative; width: 90%; max-width: 720px; margin: 0 auto; padding: 15px; border-radius: 25px;
   background:#e6e6e6; box-shadow:8px 8px 16px #b8b8b8, -8px -8px 16px #ffffff;
 }
 .dark .app { background:#2a2a2a; box-shadow:8px 8px 16px #161616, -8px -8px 16px #3a3a3a; }
 
 /* ===== INPUT GROUPS ===== */
-.inputGroup { display:flex; flex-direction:column; margin:8px 0; }
-.inputGroup label { font-weight:bold; margin-bottom:5px; }
-input, select, textarea {
-  width:100%; max-width:100%; padding:12px; font-size:16px; border:none; border-radius:12px;
-  background:#f2f2f2; box-shadow:inset 4px 4px 8px #bcbcbc, inset -4px -4px 8px #ffffff; outline:none;
-}
-.dark input, .dark select, .dark textarea { background:#333; color:#fff; box-shadow:inset 4px 4px 8px #141414, inset -4px -4px 8px #474747; }
+.inputGroup { display:flex; flex-direction: column; margin:8px 0; }
+.inputGroup label { font-weight: bold; margin-bottom: 5px; }
+input, select, textarea { width:100%; max-width:100%; padding:12px; font-size:16px; border:none; border-radius:12px;
+  background:#f2f2f2; box-shadow: inset 4px 4px 8px #bcbcbc, inset -4px -4px 8px #ffffff; outline:none; }
+.dark input, .dark select, .dark textarea { background:#333; color:#fff; box-shadow: inset 4px 4px 8px #141414, inset -4px -4px 8px #474747; }
 
 /* ===== BUTTONS ===== */
 button { padding:14px; border:none; border-radius:18px; margin:8px 0; width:100%; font-size:16px; cursor:pointer;
-  background:#e6e6e6; box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff;
-}
+  background:#e6e6e6; box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff; }
 .dark button { background:#333; color:#fff; box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747; }
 
 /* ===== PRODUCT CARD ===== */
 .prodCard { padding:12px; border-radius:15px; background:#f3f3f3; margin:10px 0; font-size:16px; 
-  box-shadow:inset 3px 3px 7px #bcbcbc, inset -3px -3px 7px #ffffff;
-}
-.dark .prodCard { background:#333; box-shadow:inset 3px 3px 7px #141414, inset -3px -3px 7px #474747; }
+  box-shadow: inset 3px 3px 7px #bcbcbc, inset -3px -3px 7px #ffffff; }
+.dark .prodCard { background:#333; box-shadow: inset 3px 3px 7px #141414, inset -3px -3px 7px #474747; }
 .prodTitle { font-size:18px; font-weight:bold; margin-bottom:6px; }
 
 /* ===== FOOTER ===== */
 footer { position:fixed; bottom:0; left:0; width:100%; padding:12px 0; text-align:center; font-size:15px;
-  background:rgba(224,224,224,0.7); backdrop-filter:blur(10px); box-shadow:0 -3px 12px rgba(0,0,0,0.2);
-}
-.dark footer { background:rgba(30,30,30,0.65); color:#fff; }
+  background: rgba(224,224,224,0.7); backdrop-filter:blur(10px); box-shadow:0 -3px 12px rgba(0,0,0,0.2); }
+.dark footer { background: rgba(30,30,30,0.65); color:#fff; }
 
 /* ===== DARK MODE TOGGLE ===== */
-.toggleDark { position:fixed; top:10px; right:10px; width:60px; height:60px; border-radius:50%;
+.toggleDark { position: fixed; top:10px; right:10px; width:60px; height:60px; border-radius:50%;
   background:#e6e6e6; display:flex; align-items:center; justify-content:center; font-size:26px; cursor:grab;
-  box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff; z-index:9999; transition:0.2s;
-}
+  box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff; z-index:9999; transition:0.2s; }
 .dark .toggleDark { background:#333; box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747; }
 .toggleDark:active { transform:scale(1.1); cursor:grabbing; }
 
 /* ===== ADD PRODUCT POPUP ===== */
-.popup-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6);
-  display:none; justify-content:center; align-items:center; padding:10px; z-index:9999;
+.popup-overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6);
+  display: none; justify-content: center; align-items: flex-start; padding:5px; z-index: 9999;
 }
-.popup-container { width:100%; max-width:450px; background:#e0e0e0; border-radius:20px; padding:15px;
-  max-height:95vh; overflow-y:auto; box-shadow:8px 8px 20px #b8b8b8, -8px -8px 20px #ffffff;
+.popup-container {
+  width:100%; max-width: 95%; background:#e0e0e0; border-radius:20px; padding:10px;
+  max-height: 95vh; overflow-y:auto; box-shadow: 8px 8px 20px #b8b8b8, -8px -8px 20px #ffffff;
+  position: relative; top: 10px;
 }
 .dark .popup-container { background:#2a2a2a; box-shadow:8px 8px 20px #161616, -8px -8px 20px #3a3a3a; }
-.popup-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.popup-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; cursor: grab; }
 .close-btn { font-size:28px; background:none; border:none; cursor:pointer; }
 #imgPrevContainer img { width:100%; border-radius:12px; margin-top:8px; }
 .popup-footer { display:flex; justify-content:space-between; margin-top:12px; }
 .btn-cancel, .btn-save { padding:12px 20px; border-radius:14px; font-size:15px; width:48%; border:none; cursor:pointer; }
 .btn-cancel { background:#ffdddd; } .btn-save { background:#c8ffc8; }
 
+/* ===== POPUP BODY TWO-COLUMN RESPONSIVE ===== */
+.popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+@media (min-width: 600px) {
+  .popup-body {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .popup-body .inputGroup { width:48%; }
+}
 </style>
 </head>
 
@@ -85,7 +95,6 @@ footer { position:fixed; bottom:0; left:0; width:100%; padding:12px 0; text-alig
 
   <!-- MAIN APP -->
   <div id="mainApp">
-
     <button onclick="openAddProduct()">➕ Add Product</button>
     <button onclick="resetAll()">🗑 Reset All</button>
 
@@ -105,7 +114,6 @@ footer { position:fixed; bottom:0; left:0; width:100%; padding:12px 0; text-alig
     <button onclick="exportCSV()">Export CSV</button>
     <button onclick="generatePDFMenu()">Export PDF</button>
     <button onclick="showInvoiceHistory()">Invoice History</button>
-
   </div>
 </div>
 
@@ -143,7 +151,12 @@ document.getElementById("year").textContent = new Date().getFullYear();
 let products=[];
 
 /* ===== ADD PRODUCT POPUP ===== */
-function openAddProduct(){ document.getElementById("addProductPopup").style.display="flex"; }
+function openAddProduct(){ 
+  const popup=document.getElementById("addProductPopup");
+  const container=popup.querySelector(".popup-container");
+  container.style.top="10px"; // reset top
+  popup.style.display="flex"; 
+}
 function closeAddProduct(){ document.getElementById("addProductPopup").style.display="none"; }
 
 document.getElementById("p_img").addEventListener("change", e=>{
@@ -239,6 +252,41 @@ function endDrag(e){
     document.removeEventListener("touchmove", dragMove);
     document.removeEventListener("touchend", endDrag);
     if(!dragging) toggleDarkMode();
+}
+
+/* ===== VERTICALLY DRAGGABLE POPUP ===== */
+const popup = document.getElementById("addProductPopup");
+const popupContainer = popup.querySelector(".popup-container");
+const popupHeader = popup.querySelector(".popup-header");
+let popupDragging = false, popupStartY = 0;
+
+popupHeader.addEventListener("mousedown", startPopupDrag);
+popupHeader.addEventListener("touchstart", startPopupDrag, {passive:false});
+
+function startPopupDrag(e){
+    e.preventDefault();
+    popupDragging = false;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    popupStartY = clientY - popupContainer.getBoundingClientRect().top;
+    document.addEventListener(e.type.includes("touch")?"touchmove":"mousemove", dragPopup,{passive:false});
+    document.addEventListener(e.type.includes("touch")?"touchend":"mouseup", endPopupDrag);
+}
+
+function dragPopup(e){
+    e.preventDefault();
+    popupDragging = true;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    let y = clientY - popupStartY;
+    y = Math.max(10, Math.min(window.innerHeight - popupContainer.offsetHeight - 10, y));
+    popupContainer.style.position = "absolute";
+    popupContainer.style.top = y + "px";
+}
+
+function endPopupDrag(e){
+    document.removeEventListener("mousemove", dragPopup);
+    document.removeEventListener("mouseup", endPopupDrag);
+    document.removeEventListener("touchmove", dragPopup);
+    document.removeEventListener("touchend", endPopupDrag);
 }
 </script>
 </body>
