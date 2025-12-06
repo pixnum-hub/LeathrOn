@@ -4,13 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeathrOn - Leather Costing Calculator</title>
-
 <style>
-/* ================= GLOBAL ================= */
-html, body {margin:0; padding:0; font-family:Arial,sans-serif; background:#e0e0e0; transition:0.3s; font-size:17px;}
-.dark { background:#1c1c1c; color:#fff; }
+html, body {margin:0; padding:0; font-family:Arial,sans-serif; font-size:17px; background:#e0e0e0; transition:0.3s;}
+.dark {background:#1c1c1c; color:#fff;}
 
-/* ================= APP CONTAINER ================= */
 .app {
   position:relative;
   width:100%;
@@ -21,22 +18,19 @@ html, body {margin:0; padding:0; font-family:Arial,sans-serif; background:#e0e0e
   background:#e6e6e6;
   box-shadow:8px 8px 16px #b8b8b8, -8px -8px 16px #ffffff;
 }
-.dark .app {
-  background:#2a2a2a;
-  box-shadow:8px 8px 16px #161616, -8px -8px 16px #3a3a3a;
-}
+.dark .app {background:#2a2a2a; box-shadow:8px 8px 16px #161616, -8px -8px 16px #3a3a3a;}
 
-/* ================= FLEX INPUT ALIGN ================= */
-.inputGroup { display:flex; flex-direction:column; margin:10px 12px; }
-.inputGroup label { font-weight:bold; margin-bottom:6px; }
+/* ================= INPUT ALIGNMENT ================= */
+.inputGroup {display:flex; flex-direction:column; margin:10px 0;}
+.inputGroup label {font-weight:bold; margin-bottom:6px;}
 .inputGroup input, .inputGroup select, .inputGroup textarea {
   width:100%;
-  padding:14px;
-  font-size:17px;
+  padding:12px;
   border:none;
   border-radius:15px;
   background:#f2f2f2;
   box-shadow:inset 4px 4px 8px #bcbcbc, inset -4px -4px 8px #ffffff;
+  font-size:16px;
   outline:none;
 }
 .dark .inputGroup input, .dark .inputGroup select, .dark .inputGroup textarea {
@@ -47,45 +41,26 @@ html, body {margin:0; padding:0; font-family:Arial,sans-serif; background:#e0e0e
 
 /* ================= BUTTONS ================= */
 button {
-  padding:16px;
+  padding:14px;
   border:none;
   border-radius:18px;
-  margin:12px;
-  width:calc(100% - 24px);
+  margin:10px 0;
+  width:100%;
   font-size:17px;
   cursor:pointer;
   background:#e6e6e6;
   box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff;
 }
-.dark button {
-  background:#333; color:#fff;
-  box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747;
-}
+.dark button {background:#333; color:#fff; box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747;}
 
 /* ================= PRODUCT CARD ================= */
-.prodCard {
-  padding:15px;
-  border-radius:18px;
-  background:#f3f3f3;
-  margin:12px;
-  font-size:18px;
-  box-shadow:inset 3px 3px 7px #bcbcbc, inset -3px -3px 7px #ffffff;
-}
-.dark .prodCard { background:#333; box-shadow:inset 3px 3px 7px #141414, inset -3px -3px 7px #474747; }
-.prodTitle { font-size:20px; font-weight:bold; margin-bottom:8px; }
+.prodCard {padding:15px; border-radius:18px; background:#f3f3f3; margin:12px 0; font-size:18px; box-shadow:inset 3px 3px 7px #bcbcbc, inset -3px -3px 7px #ffffff;}
+.dark .prodCard {background:#333; box-shadow:inset 3px 3px 7px #141414, inset -3px -3px 7px #474747;}
+.prodTitle {font-size:20px; font-weight:bold; margin-bottom:8px;}
 
 /* ================= FOOTER ================= */
-footer {
-  position:fixed; bottom:0; left:0;
-  width:100%;
-  padding:14px 0;
-  text-align:center;
-  background:rgba(224,224,224,0.7);
-  font-size:16px;
-  backdrop-filter:blur(10px);
-  box-shadow:0 -3px 12px rgba(0,0,0,0.2);
-}
-.dark footer { background:rgba(30,30,30,0.65); color:#fff; }
+footer {position:fixed; bottom:0; left:0; width:100%; padding:14px 0; text-align:center; background:rgba(224,224,224,0.7); font-size:16px; backdrop-filter:blur(10px); box-shadow:0 -3px 12px rgba(0,0,0,0.2);}
+.dark footer {background:rgba(30,30,30,0.65); color:#fff;}
 
 /* ================= DARK MODE TOGGLE ================= */
 .toggleDark {
@@ -96,59 +71,46 @@ footer {
   display:flex; align-items:center; justify-content:center;
   font-size:26px; cursor:grab;
   box-shadow:6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff;
-  z-index:9999;
-  transition:0.2s;
+  z-index:9999; transition:0.2s;
 }
-.dark .toggleDark { background:#333; box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747; }
-.toggleDark:active { transform:scale(1.1); cursor:grabbing; }
+.dark .toggleDark {background:#333; box-shadow:6px 6px 12px #141414, -6px -6px 12px #474747;}
+.toggleDark:active {transform:scale(1.1); cursor:grabbing;}
 
 /* ================= ADD PRODUCT POPUP ================= */
-.popup-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:none; justify-content:center; align-items:center; padding:15px; z-index:9999; }
+.popup-overlay {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; padding:10px; z-index:9999;
+}
 .popup-container {
   width:100%; max-width:480px;
-  background:#e0e0e0; border-radius:22px; padding:20px;
+  background:#e6e6e6; border-radius:20px; padding:15px;
   box-shadow:8px 8px 20px #b8b8b8, -8px -8px 20px #ffffff;
   max-height:95vh; overflow-y:auto;
 }
-.dark .popup-container { background:#2a2a2a; box-shadow:8px 8px 20px #161616, -8px -8px 20px #3a3a3a; }
-.popup-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
-.close-btn { font-size:28px; background:none; border:none; cursor:pointer; }
-#imgPrevContainer img { width:100%; border-radius:15px; margin-top:10px; }
-.popup-footer { display:flex; justify-content:space-between; margin-top:18px; }
-.btn-cancel, .btn-save { padding:14px 28px; border-radius:16px; border:none; font-size:16px; cursor:pointer; width:48%; }
-.btn-cancel { background:#ffdddd; box-shadow: inset 4px 4px 10px #c8a8a8, inset -4px -4px 10px #fff0f0; }
-.btn-save { background:#c8ffc8; box-shadow: inset 4px 4px 10px #a5d6a5, inset -4px -4px 10px #ffffff; }
+.dark .popup-container {background:#2a2a2a; box-shadow:8px 8px 20px #161616, -8px -8px 20px #3a3a3a;}
+.popup-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+.close-btn {font-size:28px; background:none; border:none; cursor:pointer;}
+#imgPrev {width:100%; margin-top:10px; border-radius:12px; display:none;}
 </style>
 </head>
-
 <body>
-<div class="app" id="mainContainer">
 
-  <!-- DARK MODE TOGGLE -->
+<div class="app" id="mainContainer">
   <div class="toggleDark" id="darkToggle"><span id="darkIcon">🌙</span></div>
 
   <h2 style="text-align:center;">LeathrOn</h2>
 
-  <!-- SUBSCRIPTION -->
   <div id="subscriptionUI"></div>
 
-  <!-- MAIN APP -->
   <div id="mainApp">
-
     <button onclick="openAddProduct()">➕ Add Product</button>
     <button onclick="resetAll()">🗑 Reset All</button>
 
-    <!-- SEARCH -->
     <div class="inputGroup"><label>Search Products</label><input id="searchProd" placeholder="Search Products" oninput="filterProducts()"></div>
-
-    <!-- PRODUCT LIST -->
     <div id="productList"></div>
 
-    <!-- GST / PROFIT -->
     <div class="inputGroup"><label>GST %</label><input id="gst" type="number" value="18"></div>
     <div class="inputGroup"><label>Profit %</label><input id="profit" type="number" value="20"></div>
-
-    <!-- CURRENCY -->
     <div class="inputGroup"><label>Currency</label><select id="currency"><option value="INR">INR ₹</option><option value="USD">USD $</option></select></div>
 
     <button onclick="calculateFinal()">Calculate Grand Total</button>
@@ -158,7 +120,6 @@ footer {
     <button onclick="exportCSV()">Export CSV</button>
     <button onclick="generatePDFMenu()">Export PDF</button>
     <button onclick="showInvoiceHistory()">Invoice History</button>
-
   </div>
 </div>
 
@@ -179,11 +140,8 @@ footer {
       <div class="inputGroup"><label>Quantity</label><input id="p_qty" type="number" value="1"></div>
       <div class="inputGroup"><label>Extra Expenses</label><input id="p_extra" type="number"></div>
       <div class="inputGroup"><label>Notes</label><textarea id="p_note"></textarea></div>
-      <div class="inputGroup"><label>Product Image</label><input id="p_img" type="file" accept="image/*"><div id="imgPrevContainer"></div></div>
-    </div>
-    <div class="popup-footer">
-      <button class="btn-cancel" onclick="closeAddProduct()">Cancel</button>
-      <button class="btn-save" id="saveProdBtn">Save Product</button>
+      <div class="inputGroup"><label>Product Image</label><input id="p_img" type="file" accept="image/*"><img id="imgPrev"></div>
+      <button id="saveProdBtn">Save Product</button>
     </div>
   </div>
 </div>
@@ -191,34 +149,26 @@ footer {
 <footer>© <span id="year"></span> Manik Roy. All Right Reserved.</footer>
 
 <script>
-/* ========= FULL JS (All previous features intact) ========= */
-
 /* Year */
-document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("year").textContent=new Date().getFullYear();
 
-/* Device lock */
-const deviceKey = "dev-"+btoa(navigator.userAgent+screen.width+screen.height);
-if(localStorage.lc_device && localStorage.lc_device!==deviceKey){ alert("Locked to another device."); document.body.innerHTML="DEVICE LOCKED"; throw ""; }
-else localStorage.lc_device=deviceKey;
-
-/* Subscription */
-if(!localStorage.lc_start) localStorage.lc_start=Date.now();
-let subscribed = localStorage.lc_sub==="yes";
-function renderSub(){ let rem=Math.floor((30*86400000-(Date.now()-localStorage.lc_start))/86400000); const box=document.getElementById("subscriptionUI"); if(subscribed){ document.getElementById("mainApp").classList.remove("hidden"); box.innerHTML="Subscription Active ✓"; return; } if(Date.now()-localStorage.lc_start<30*86400000){ box.innerHTML=`Trial: ${rem} days left<br><button onclick="pay()">Buy ₹299/month</button>`; document.getElementById("mainApp").classList.remove("hidden"); } else{ box.innerHTML=`Trial expired<br><button onclick="pay()">Buy ₹299/month</button><br><input id='adm' placeholder='Admin Code'><button onclick='admUnlock()'>Unlock</button>`; } }
-renderSub();
-
-/* Add Product Popup Logic */
+/* Product Array */
 let products=[], filteredProducts=[];
-function openAddProduct(){ document.getElementById("addProductPopup").style.display="flex"; }
-function closeAddProduct(){ document.getElementById("addProductPopup").style.display="none"; }
 
-document.getElementById("p_img").addEventListener("change",e=>{ const f=e.target.files[0]; const container=document.getElementById("imgPrevContainer"); if(f){ const r=new FileReader(); r.onload=()=>{ container.innerHTML=`<img src='${r.result}'>`; }; r.readAsDataURL(f); } });
+/* Open / Close Add Product */
+function openAddProduct(){document.getElementById("addProductPopup").style.display="flex";}
+function closeAddProduct(){document.getElementById("addProductPopup").style.display="none"; document.getElementById("imgPrev").style.display="none"; document.getElementById("p_img").value="";}
 
-document.getElementById("saveProdBtn").addEventListener("click",()=>{ 
-  const p={ type:document.getElementById("p_type").value, material:document.getElementById("p_material").value, grade:document.getElementById("p_grade").value, thick:Number(document.getElementById("p_thick").value), area:Number(document.getElementById("p_area").value), rate:Number(document.getElementById("p_rate").value), qty:Number(document.getElementById("p_qty").value), extra:Number(document.getElementById("p_extra").value), note:document.getElementById("p_note").value, img:document.getElementById("imgPrevContainer").querySelector("img")?.src||"" }; 
-  p.total=(p.area*p.rate+p.extra)*p.qty; products.push(p); closeAddProduct(); renderProducts(); 
+/* Image Preview */
+document.getElementById("p_img").addEventListener("change", e=>{ const f=e.target.files[0]; const img=document.getElementById("imgPrev"); if(f){ const r=new FileReader(); r.onload=()=>{ img.src=r.result; img.style.display="block"; }; r.readAsDataURL(f); } });
+
+/* Save Product */
+document.getElementById("saveProdBtn").addEventListener("click", ()=>{
+  const p={type:document.getElementById("p_type").value, material:document.getElementById("p_material").value, grade:document.getElementById("p_grade").value, thick:Number(document.getElementById("p_thick").value), area:Number(document.getElementById("p_area").value), rate:Number(document.getElementById("p_rate").value), qty:Number(document.getElementById("p_qty").value), extra:Number(document.getElementById("p_extra").value), note:document.getElementById("p_note").value, img:document.getElementById("imgPrev").src||""};
+  p.total=(p.area*p.rate+p.extra)*p.qty; products.push(p); closeAddProduct(); renderProducts();
 });
 
+/* Render Products */
 function renderProducts(){ filteredProducts=products.slice(); updateProductList(); }
 function updateProductList(){ const box=document.getElementById("productList"); box.innerHTML=""; filteredProducts.forEach((p,i)=>{ box.innerHTML+=`<div class='prodCard'><div class='prodTitle'>${p.type} (${p.material}) x${p.qty}</div>Area: ${p.area} | Rate: ${p.rate}<br>Total: ₹${p.total.toFixed(2)}<br><button onclick='delProd(${i})'>Delete</button><button onclick='cloneProd(${i})'>Duplicate</button></div>`; }); }
 function delProd(i){ products.splice(i,1); renderProducts(); }
@@ -228,26 +178,6 @@ function resetAll(){ if(confirm("Clear all products and inputs?")){ products=[];
 
 /* Calculation */
 function calculateFinal(){ let sub=products.reduce((a,b)=>a+b.total,0); let g=Number(document.getElementById("gst").value), pr=Number(document.getElementById("profit").value); let gstAmt=sub*(g/100), prAmt=sub*(pr/100); let final=sub+gstAmt+prAmt; const c=document.getElementById("currency").value; if(c=="USD") final=(final/82).toFixed(2); document.getElementById("grandTotal").innerHTML=`Subtotal: ₹${sub.toFixed(2)}<br>GST (${g}%): ₹${gstAmt.toFixed(2)}<br>Profit (${pr}%): ₹${prAmt.toFixed(2)}<br><br><b>Grand Total: ${c=="INR"?"₹":"$"}${final}</b>`; }
-
-/* Dark Mode Toggle */
-const darkToggle=document.getElementById("darkToggle");
-let dragging=false, offsetX=0, offsetY=0, clickStartX=0, clickStartY=0, dragThreshold=5;
-darkToggle.addEventListener("mousedown", startDrag);
-darkToggle.addEventListener("touchstart", startDrag,{passive:false});
-function startDrag(e){ e.preventDefault(); const rect=darkToggle.getBoundingClientRect(); const clientX=e.touches?e.touches[0].clientX:e.clientX; const clientY=e.touches?e.touches[0].clientY:e.clientY; offsetX=clientX-rect.left; offsetY=clientY-rect.top; clickStartX=clientX; clickStartY=clientY; dragging=false; document.addEventListener("mousemove",dragToggle); document.addEventListener("mouseup",endDrag); document.addEventListener("touchmove",dragToggle,{passive:false}); document.addEventListener("touchend",endDrag);}
-function dragToggle(e){ e.preventDefault(); const clientX=e.touches?e.touches[0].clientX:e.clientX; const clientY=e.touches?e.touches[0].clientY:e.clientY; if(Math.abs(clientX-clickStartX)>dragThreshold || Math.abs(clientY-clickStartY)>dragThreshold) dragging=true; let x=clientX-offsetX, y=clientY-offsetY; x=Math.max(0, Math.min(window.innerWidth-darkToggle.offsetWidth, x)); y=Math.max(0, Math.min(window.innerHeight-darkToggle.offsetHeight, y)); darkToggle.style.left=x+"px"; darkToggle.style.top=y+"px"; }
-function endDrag(e){ document.removeEventListener("mousemove",dragToggle); document.removeEventListener("mouseup",endDrag); document.removeEventListener("touchmove",dragToggle); document.removeEventListener("touchend",endDrag); if(!dragging) toggleDarkMode(); }
-function toggleDarkMode(){ document.body.classList.toggle("dark"); document.getElementById("darkIcon").textContent=document.body.classList.contains("dark")?"☀️":"🌙"; localStorage.lc_dark=document.body.classList.contains("dark")?"yes":"no"; }
-if(localStorage.lc_dark==="yes"){ document.body.classList.add("dark"); document.getElementById("darkIcon").textContent="☀️"; }
-
-/* Export / Invoice Logic (kept intact) */
-function exportTXT(){ let t="LEATHER COST REPORT\n\n"; products.forEach(p=>{ t+=`${p.type} x${p.qty} = ₹${p.total.toFixed(2)}\n`; }); saveFile(t,"report.txt"); }
-function exportCSV(){ let c="Type,Material,Qty,Area,Rate,Total\n"; products.forEach(p=>{ c+=`${p.type},${p.material},${p.qty},${p.area},${p.rate},${p.total}\n`; }); saveFile(c,"report.csv"); }
-function saveFile(txt,name){ let blob=new Blob([txt],{type:"text/plain"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click(); }
-function saveInv(name,amt){ let arr=JSON.parse(localStorage.getItem("lc_inv")||"[]"); arr.push({id:"INV"+Date.now(),date:new Date().toLocaleString(),name,amt}); localStorage.setItem("lc_inv",JSON.stringify(arr)); }
-function showInvoiceHistory(){ let arr=JSON.parse(localStorage.getItem("lc_inv")||"[]"); let h="<h3>Invoice History</h3>"; arr.forEach(i=>h+=`<p>${i.id}<br>${i.date}<br>${i.name} - ₹${i.amt}</p><hr>`); document.getElementById("addProductPopup").style.display="none"; pop(h); }
-
-function pop(html){ let d=document.createElement("div"); d.className="popup-container"; d.innerHTML=html+`<br><button onclick='document.body.removeChild(this.parentNode)'>Close</button>`; document.body.appendChild(d); }
 </script>
 </body>
 </html>
