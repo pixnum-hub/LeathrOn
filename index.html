@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LeathrOn - Leather Costing Calculator</title>
+<style>
+body{margin:0;font-family:Arial;background:#e0e0e0;transition:0.3s;}
+.dark{background:#1c1c1c;color:#fff;}
+.app{position:relative;max-width:1000px;margin:30px auto;padding:25px;border-radius:30px;background:#e6e6e6;box-shadow:9px 9px 18px #b8b8b8,-9px -9px 18px #ffffff;}
+.dark .app{background:#2a2a2a;box-shadow:9px 9px 18px #161616,-9px -9px 18px #3a3a3a;}
+input,select,textarea{width:100%;padding:12px;border:none;margin:8px 0;border-radius:15px;background:#f2f2f2;box-shadow:inset 5px 5px 10px #bcbcbc,inset -5px -5px 10px #ffffff;outline:none;}
+.dark input,.dark select,.dark textarea{background:#333;color:#fff;box-shadow:inset 5px 5px 10px #141414,inset -5px -5px 10px #474747;}
+button{padding:14px 18px;border:none;border-radius:20px;margin:10px 0;background:#e6e6e6;box-shadow:6px 6px 12px #b8b8b8,-6px -6px 12px #ffffff;cursor:pointer;font-size:16px;width:100%;}
+.dark button{background:#333;color:#fff;box-shadow:6px 6px 12px #141414,-6px -6px 12px #474747;}
+.container{padding:20px;padding-bottom:150px;}
+.prodCard{padding:15px;border-radius:20px;background:#f3f3f3;margin:10px 0;box-shadow:inset 3px 3px 7px #bcbcbc,inset -3px -3px 7px #ffffff;}
+.dark .prodCard{background:#333;box-shadow:inset 3px 3px 7px #141414,inset -3px -3px 7px #474747;}
+.prodTitle{font-size:18px;font-weight:bold;margin:5px 0;}
+.popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:25px;border-radius:22px;z-index:999999;width:90%;max-width:450px;max-height:85vh;overflow:auto;box-shadow:0 0 30px #0004;}
+.dark .popup{background:#2e2e2e;color:#fff;}
+footer{position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:12px 0;font-size:14px;z-index:999;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:0.3s;background:rgba(224,224,224,0.65);color:#000;box-shadow:0 -3px 12px rgba(0,0,0,0.15),inset -3px -3px 8px rgba(255,255,255,0.7),inset 3px 3px 8px rgba(0,0,0,0.1);}
+.dark footer{background:rgba(30,30,30,0.55);color:#fff;box-shadow:0 -3px 12px rgba(0,0,0,0.45),inset -3px -3px 8px rgba(80,80,80,0.2),inset 3px 3px 8px rgba(0,0,0,0.6);}
+.toggleDark{position:absolute;top:15px;right:15px;width:50px;height:50px;border-radius:50%;background:#e6e6e6;cursor:grab;box-shadow:6px 6px 12px #b8b8b8,-6px -6px 12px #ffffff;display:flex;justify-content:center;align-items:center;font-size:22px;z-index:9999;transition:0.2s;}
+.dark .toggleDark{background:#333;box-shadow:6px 6px 12px #141414,-6px -6px 12px #474747;}
+.toggleDark:active{cursor:grabbing;transform:scale(1.1);}
+</style>
+</head>
+<body>
+
+<div class="container app" id="mainContainer">
+  <div class="toggleDark" id="darkToggle"><span id="darkIcon">🌙</span></div>
+
+  <h2>LeathrOn</h2>
+  <div id="subscriptionUI"></div>
+
+  <div id="mainApp" class="hidden">
+    <button onclick="openProductPopup()">➕ Add Product</button>
+    <button onclick="resetAll()">🗑 Reset All</button>
+    <input id="searchProd" placeholder="Search Products" oninput="filterProducts()">
+    <div id="productList"></div>
+
+    <h3>GST %</h3><input id="gst" type="number" value="18">
+    <h3>Profit %</h3><input id="profit" type="number" value="20">
+    <select id="currency">
+      <option value="INR">INR ₹</option>
+      <option value="USD">USD $</option>
+    </select>
+
+    <button onclick="calculateFinal()">Calculate Grand Total</button>
+    <h2 id="grandTotal"></h2>
+
+    <button onclick="exportTXT()">Export TXT</button>
+    <button onclick="exportCSV()">Export CSV</button>
+    <button onclick="generatePDFMenu()">Export PDF</button>
+    <button onclick="showInvoiceHistory()">Invoice History</button>
+  </div>
+</div>
+
+<footer>© <span id="year"></span> Manik Roy. All Right Reserved.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// DEVICE LOCK
+const deviceKey="dev-"+btoa(navigator.userAgent+screen.width+screen.height);
+if(localStorage.lc_device && localStorage.lc_device!==deviceKey){alert("Locked to another device.");document.body.innerHTML="DEVICE LOCKED";throw "";}else localStorage.lc_device=deviceKey;
+
+// TRIAL & SUBSCRIPTION
+if(!localStorage.lc_start){localStorage.lc_start=Date.now();}
+let subscribed = localStorage.lc_sub=="yes";
+function renderSub(){let rem=Math.floor((30*86400000-(Date.now()-localStorage.lc_start))/86400000);const box=document.getElementById("subscriptionUI");if(subscribed){document.getElementById("mainApp").classList.remove("hidden");box.innerHTML="Subscription Active ✓";return;}if(Date.now()-localStorage.lc_start<30*86400000){box.innerHTML=`Trial: ${rem} days left<br><button onclick="pay()">Buy ₹299/month</button>`;document.getElementById("mainApp").classList.remove("hidden");} else{box.innerHTML=`Trial expired<br><button onclick="pay()">Buy ₹299/month</button><br><input id="adm" placeholder='Admin Code'><button onclick="admUnlock()">Unlock</button>`;}}
+function pay(){let upi="upi://pay?pa=9433082017@ybl&pn=Manik%20Roy&am=299&cu=INR";let qr="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(upi);pop(`<h3>Pay ₹299</h3><img src="${qr}" style="width:200px;"><br>UPI: 9433082017@ybl<button onclick='activateSub()'>I Paid</button>`);}
+function activateSub(){localStorage.lc_sub="yes";subscribed=true;saveInv("₹299 Subscription",299);closePop();renderSub();}
+function admUnlock(){if(document.getElementById("adm").value=="MR-LX9Q-72KF-P8W3"){localStorage.lc_sub="yes";subscribed=true;saveInv("Admin Unlock",0);renderSub();}else alert("Invalid Code");}
+renderSub();
+
+// POPUP
+let popbox=null;
+function pop(html){if(popbox)popbox.remove();let d=document.createElement("div");d.className="popup";d.innerHTML=html+`<br><button onclick="closePop()">Close</button>`;document.body.appendChild(d);popbox=d;}
+function closePop(){if(popbox)popbox.remove();}
+
+// PRODUCTS
+let products=[];let filteredProducts=[];
+function openProductPopup(){let html=`<h3>Add Product</h3>
+<label>Product Type</label><select id='p_type'><option>Bag</option><option>Wallet</option><option>Belt</option><option>Shoe</option><option>Other</option></select>
+<label>Material</label><select id='p_material'><option>Full-Grain</option><option>Top-Grain</option><option>Bonded</option></select>
+<label>Grade</label><input id='p_grade'><label>Thickness (mm)</label><input id='p_thick' type='number'>
+<label>Leather Area (sq.ft)</label><input id='p_area' type='number'><label>Leather Rate</label><input id='p_rate' type='number'><label>Quantity</label><input id='p_qty' type='number' value='1'>
+<label>Extra Expenses</label><input id='p_extra' type='number'><label>Notes</label><textarea id='p_note'></textarea>
+<label>Product Image</label><input id='p_img' type='file' accept='image/*' onchange='prevImg(event)'><img id='imgPrev' style='width:100%;border-radius:15px;display:none;margin-top:10px;'>
+<button onclick='saveProduct()'>Save Product</button>`;pop(html);}
+function prevImg(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{imgPrev.src=r.result;imgPrev.style.display="block";};r.readAsDataURL(f);}
+function saveProduct(){let o={type:val("p_type"),material:val("p_material"),grade:val("p_grade"),thick:num("p_thick"),area:num("p_area"),rate:num("p_rate"),qty:num("p_qty"),extra:num("p_extra"),note:val("p_note"),img:document.getElementById("imgPrev").src||""};o.total=(o.area*o.rate+o.extra)*o.qty;products.push(o);closePop();renderProducts();}
+function val(id){return document.getElementById(id).value;}function num(id){return Number(val(id))||0;}
+function renderProducts(){filteredProducts=products.slice();updateProductList();}
+function updateProductList(){let box=document.getElementById("productList");box.innerHTML="";filteredProducts.forEach((p,i)=>{box.innerHTML+=`<div class='prodCard'><div class='prodTitle'>${p.type} (${p.material}) x${p.qty}</div>Area: ${p.area} sq.ft | Rate: ${p.rate}<br>Total: ₹${p.total.toFixed(2)}<br><button onclick="delProd(${i})">Delete</button> <button onclick="cloneProd(${i})">Duplicate</button></div>`;});}
+function delProd(i){products.splice(i,1);renderProducts();}
+function cloneProd(i){products.push(JSON.parse(JSON.stringify(products[i])));renderProducts();}
+function filterProducts(){const q=document.getElementById("searchProd").value.toLowerCase();filteredProducts=products.filter(p=>p.type.toLowerCase().includes(q)||p.material.toLowerCase().includes(q));updateProductList();}
+function resetAll(){if(confirm("Clear all products and inputs?")){products=[];renderProducts();document.getElementById("grandTotal").innerHTML="";document.getElementById("gst").value=18;document.getElementById("profit").value=20;document.getElementById("currency").value="INR";document.getElementById("searchProd").value="";}}
+
+// CALCULATION
+function calculateFinal(){let sub=products.reduce((a,b)=>a+b.total,0);let g=num("gst"),pr=num("profit");let gstAmt=sub*(g/100);let prAmt=sub*(pr/100);let final=sub+gstAmt+prAmt;const c=document.getElementById("currency").value;if(c=="USD"){final=(final/82).toFixed(2);}document.getElementById("grandTotal").innerHTML=`Subtotal: ₹${sub.toFixed(2)}<br>GST (${g}%): ₹${gstAmt.toFixed(2)}<br>Profit (${pr}%): ₹${prAmt.toFixed(2)}<br><br><b>Grand Total: ${c=="INR"?"₹":"$"}${final}</b>`;}
+
+// EXPORT TXT & CSV
+function exportTXT(){let t="LEATHER COST REPORT\n\n";products.forEach(p=>{t+=`${p.type} x${p.qty} = ₹${p.total.toFixed(2)}\n`;});saveFile(t,"report.txt");}
+function exportCSV(){let c="Type,Material,Qty,Area,Rate,Total\n";products.forEach(p=>{c+=`${p.type},${p.material},${p.qty},${p.area},${p.rate},${p.total}\n`;});saveFile(c,"report.csv");}
+function saveFile(txt,name){let blob=new Blob([txt],{type:"text/plain"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+
+// INVOICE
+function saveInv(name,amt){let arr=JSON.parse(localStorage.getItem("lc_inv")||"[]");arr.push({id:"INV"+Date.now(),date:new Date().toLocaleString(),name,amt});localStorage.setItem("lc_inv",JSON.stringify(arr));}
+function showInvoiceHistory(){let arr=JSON.parse(localStorage.getItem("lc_inv")||"[]");let h="<h3>Invoice History</h3>";arr.forEach(i=>h+=`<p>${i.id}<br>${i.date}<br>${i.name} - ₹${i.amt}</p><hr>`);pop(h);}
+
+// PDF Generation using jsPDF with Images
+async function generatePDFMenu(){pop(`<h3>Choose PDF Type</h3><button onclick="generatePDF('compact')">Compact PDF</button><button onclick="generatePDF('detailed')">Detailed PDF with Images</button>`);}
+async function generatePDF(type){
+  closePop();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y=10;
+  doc.setFontSize(16); doc.text("Leather Costing Report",10,y); y+=10;
+  doc.setFontSize(12); doc.text("Date: "+new Date().toLocaleString(),10,y); y+=10;
+  doc.text("Invoice ID: INV"+Date.now(),10,y); y+=10;
+  doc.line(10,y,200,y); y+=5;
+
+  if(type=="compact"){
+    products.forEach(p=>{doc.text(`${p.type} x${p.qty} = ₹${p.total.toFixed(2)}`,10,y);y+=8;});
+  } else {
+    for(const p of products){
+      if(p.img){await new Promise(r=>{
+        let im=new Image();im.src=p.img;im.onload=()=>{doc.addImage(im,'JPEG',10,y,30,30);r();};});}
+      doc.text(`Product: ${p.type}`,50,y); y+=6;
+      doc.text(`Material: ${p.material}`,50,y); y+=6;
+      doc.text(`Grade: ${p.grade}`,50,y); y+=6;
+      doc.text(`Qty: ${p.qty} | Area: ${p.area} sq.ft | Rate: ${p.rate}`,50,y); y+=6;
+      doc.text(`Extra: ₹${p.extra} | Total: ₹${p.total.toFixed(2)}`,50,y); y+=10;
+      if(y>260){doc.addPage();y=10;}
+    }
+  }
+
+  const subtotal = products.reduce((a,b)=>a+b.total,0);
+  const gstAmt=subtotal*(num("gst")/100); const prAmt=subtotal*(num("profit")/100); const total=subtotal+gstAmt+prAmt;
+  y+=5; doc.line(10,y,200,y); y+=5;
+  doc.text(`Subtotal: ₹${subtotal.toFixed(2)}`,10,y); y+=6;
+  doc.text(`GST (${num("gst")}%): ₹${gstAmt.toFixed(2)}`,10,y); y+=6;
+  doc.text(`Profit (${num("profit")}%): ₹${prAmt.toFixed(2)}`,10,y); y+=6;
+  doc.setFontSize(14); doc.text(`Grand Total: ₹${total.toFixed(2)}`,10,y);
+
+  doc.save(type=="compact"?"LeatherCompact.pdf":"LeatherDetailed.pdf");
+}
+
+// DARK MODE TOGGLE DRAG
+const darkToggle=document.getElementById("darkToggle");const appContainer=document.getElementById("mainContainer");
+let dragging=false,offsetX=0,offsetY=0,clickStartX=0,clickStartY=0,dragThreshold=5;
+darkToggle.addEventListener("mousedown",startDrag);darkToggle.addEventListener("touchstart",startDrag,{passive:false});
+function startDrag(e){e.preventDefault();const rect=darkToggle.getBoundingClientRect();const clientX=e.touches?e.touches[0].clientX:e.clientX;const clientY=e.touches?e.touches[0].clientY:e.clientY;offsetX=clientX-rect.left;offsetY=clientY-rect.top;clickStartX=clientX;clickStartY=clientY;dragging=false;document.addEventListener("mousemove",dragToggle);document.addEventListener("mouseup",endDrag);document.addEventListener("touchmove",dragToggle,{passive:false});document.addEventListener("touchend",endDrag);}
+function dragToggle(e){e.preventDefault();const clientX=e.touches?e.touches[0].clientX:e.clientX;const clientY=e.touches?e.touches[0].clientY:e.clientY;if(Math.abs(clientX-clickStartX)>dragThreshold||Math.abs(clientY-clickStartY)>dragThreshold)dragging=true;const rect=appContainer.getBoundingClientRect();let x=clientX-rect.left-offsetX;let y=clientY-rect.top-offsetY;x=Math.max(0,Math.min(rect.width-darkToggle.offsetWidth,x));y=Math.max(0,Math.min(rect.height-darkToggle.offsetHeight,y));darkToggle.style.left=x+"px";darkToggle.style.top=y+"px";}
+function endDrag(e){document.removeEventListener("mousemove",dragToggle);document.removeEventListener("mouseup",endDrag);document.removeEventListener("touchmove",dragToggle);document.removeEventListener("touchend",endDrag);if(!dragging)toggleDarkMode();}
+function toggleDarkMode(){document.body.classList.toggle("dark");document.getElementById("darkIcon").textContent=document.body.classList.contains("dark")?"☀️":"🌙";localStorage.lc_dark=document.body.classList.contains("dark")?"yes":"no";}
+if(localStorage.lc_dark=="yes"){document.body.classList.add("dark");document.getElementById("darkIcon").textContent="☀️";}
+</script>
+
+</body>
+</html>
